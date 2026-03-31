@@ -3,576 +3,577 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FSL Trading Desk — Multi-Agent</title>
+<title>FSL Trading Desk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#07090d;--surface:#0d1117;--surface2:#111820;
-  --border:#1c2a38;--border2:#243648;
-  --accent:#00e5a0;--accent-dim:#00e5a018;
-  --accent2:#3d9bff;--danger:#ff4e6a;--warn:#f5c542;
-  --text:#e2eaf4;--muted:#4a6880;--muted2:#2a4058;
-  --mono:'DM Mono',monospace;--sans:'Syne',sans-serif;
+  --bg:#040608;
+  --s1:#080d12;
+  --s2:#0c1318;
+  --s3:#101a22;
+  --b1:#0f2030;
+  --b2:#173348;
+  --b3:#1e4060;
+  --accent:#00ffb3;
+  --accent2:#0099ff;
+  --danger:#ff3d5a;
+  --warn:#ffb800;
+  --purple:#a855f7;
+  --text:#c8dcea;
+  --muted:#4a7090;
+  --dim:#263848;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'Space Grotesk',sans-serif;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;line-height:1.5;min-height:100vh;overflow-x:hidden}
-.app{max-width:860px;margin:0 auto;padding:18px 16px}
 
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.logo{font-family:var(--sans);font-size:15px;font-weight:800;letter-spacing:1px;color:var(--accent)}
-.logo span{color:var(--muted);font-weight:400;font-size:11px;margin-left:10px;letter-spacing:2px}
-.status-pill{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:10px;color:var(--muted);letter-spacing:1px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+html,body{height:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;line-height:1.5}
 
-.badges{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
-.badge{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:3px 9px;font-size:9px;color:var(--muted);letter-spacing:1px}
-.badge b{color:var(--accent);font-weight:500}
+/* Scanline overlay */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,179,0.012) 2px,rgba(0,255,179,0.012) 4px);pointer-events:none;z-index:0}
 
-.coin-bar{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
-.coin{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-family:var(--sans);font-weight:700;font-size:13px;letter-spacing:1.5px;color:var(--muted);cursor:pointer;transition:all 0.15s;min-width:80px}
-.coin:hover{border-color:var(--border2);color:var(--text)}
-.coin.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
-.coin-price{font-family:var(--mono);font-size:10px;font-weight:300;display:block;margin-top:2px;opacity:0.7}
-.coin-change{font-size:9px;display:block;margin-top:1px}
-.coin-change.up{color:var(--accent)}.coin-change.down{color:var(--danger)}
+.shell{position:relative;z-index:1;display:grid;grid-template-columns:220px 1fr;grid-template-rows:48px 1fr;min-height:100vh;max-width:1200px;margin:0 auto}
 
-.run{margin-left:auto;background:var(--accent);border:none;border-radius:8px;padding:10px 24px;font-family:var(--sans);font-weight:700;font-size:12px;letter-spacing:2px;color:#07090d;cursor:pointer;transition:all 0.15s;text-transform:uppercase;white-space:nowrap}
-.run:hover{opacity:0.88;transform:translateY(-1px)}
-.run:disabled{opacity:0.35;cursor:not-allowed;transform:none}
+/* ── Top bar ── */
+.topbar{grid-column:1/-1;display:flex;align-items:center;gap:0;border-bottom:1px solid var(--b1);background:var(--s1);padding:0 20px}
+.tb-logo{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;padding-right:20px;border-right:1px solid var(--b1);margin-right:16px}
+.tb-logo span{color:var(--muted);font-weight:400;font-size:10px;display:block;letter-spacing:1px}
+.tb-coin-bar{display:flex;gap:2px}
+.tb-coin{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:1px;color:var(--muted);cursor:pointer;padding:0 14px;height:48px;display:flex;flex-direction:column;justify-content:center;align-items:center;border-bottom:2px solid transparent;transition:all 0.15s;border-right:1px solid var(--b1)}
+.tb-coin:hover{color:var(--text);background:var(--s2)}
+.tb-coin.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--s2)}
+.tb-price{font-size:11px;font-family:var(--mono);opacity:0.7;margin-top:1px}
+.tb-chg{font-size:9px;margin-top:0}
+.tb-chg.up{color:var(--accent)}.tb-chg.dn{color:var(--danger)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.tb-status{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);letter-spacing:1px}
+.tb-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,179,0.4)}50%{opacity:0.6;box-shadow:0 0 0 4px rgba(0,255,179,0)}}
+.tb-time{font-size:10px;color:var(--dim);letter-spacing:1px}
+.run-btn{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--bg);background:var(--accent);border:none;padding:7px 18px;cursor:pointer;transition:all 0.15s;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)}
+.run-btn:hover{background:#00ffc8;transform:translateY(-1px)}
+.run-btn:disabled{opacity:0.3;cursor:not-allowed;transform:none}
 
-.market-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
-.metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px}
-.metric-label{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
-.metric-val{font-family:var(--sans);font-size:17px;font-weight:700;color:var(--text);transition:color 0.3s}
-.metric-val.up{color:var(--accent)}.metric-val.down{color:var(--danger)}
-.metric-sub{font-size:9px;color:var(--muted);margin-top:2px}
+/* ── Left sidebar ── */
+.sidebar{background:var(--s1);border-right:1px solid var(--b1);padding:16px 0;display:flex;flex-direction:column;gap:0;overflow-y:auto}
 
-/* Panel */
-.panel-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
-.panel-header{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
-.panel-title{font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.exchange-count{font-size:10px;color:var(--muted2);background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 8px;letter-spacing:1px}
-.panel-meta{font-size:10px;color:var(--muted2);margin-left:auto;letter-spacing:1px}
+.sidebar-section{padding:10px 16px 6px;border-bottom:1px solid var(--b1)}
+.sidebar-label{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
 
-.debate-feed{padding:10px 14px;display:flex;flex-direction:column;gap:6px;min-height:60px;height:380px;max-height:380px;overflow-y:auto;overflow-x:hidden}
-.debate-feed::-webkit-scrollbar{width:3px}
-.debate-feed::-webkit-scrollbar-track{background:transparent}
-.debate-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.stat-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0}
+.stat-key{font-size:10px;color:var(--muted)}
+.stat-val{font-family:var(--mono);font-size:11px;color:var(--text);font-weight:500}
+.stat-val.up{color:var(--accent)}.stat-val.dn{color:var(--danger)}
+.stat-val.warn{color:var(--warn)}
 
-.msg{display:flex;gap:8px;animation:fadeUp 0.25s ease both;max-width:100%}
-@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.big-price{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.5px;margin-bottom:2px}
+.big-chg{font-size:11px;font-family:var(--mono)}
+.big-chg.up{color:var(--accent)}.big-chg.dn{color:var(--danger)}
 
-.msg-avatar{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:2px}
-.av-analyst{background:#00e5a015;color:var(--accent);border:1px solid #00e5a025}
-.av-news{background:#3d9bff15;color:var(--accent2);border:1px solid #3d9bff25}
-.av-risk{background:#ff4e6a15;color:var(--danger);border:1px solid #ff4e6a25}
-.av-exec{background:#f5c54215;color:var(--warn);border:1px solid #f5c54225}
+.skill-badge{display:flex;align-items:center;gap:6px;padding:5px 0;font-size:9px;color:var(--muted);letter-spacing:0.5px}
+.skill-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sd-analyst{background:var(--accent)}.sd-news{background:var(--accent2)}.sd-risk{background:var(--danger)}.sd-exec{background:var(--warn)}
+
+.refresh-bar{padding:10px 16px;margin-top:auto;border-top:1px solid var(--b1)}
+.refresh-label{font-size:9px;color:var(--dim);letter-spacing:1px;margin-bottom:4px}
+.refresh-track{height:2px;background:var(--b1);border-radius:1px;overflow:hidden}
+.refresh-fill{height:100%;background:var(--accent);transition:width 0.9s linear;border-radius:1px}
+
+/* ── Main area ── */
+.main{display:flex;flex-direction:column;overflow:hidden}
+
+/* Debate panel */
+.debate-panel{flex:1;display:flex;flex-direction:column;border-bottom:1px solid var(--b1);min-height:0}
+.panel-bar{display:flex;align-items:center;gap:10px;padding:0 16px;height:36px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0}
+.panel-bar-title{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.xcount{font-size:9px;color:var(--dim);background:var(--s2);border:1px solid var(--b1);padding:1px 7px;letter-spacing:1px}
+.panel-bar-right{margin-left:auto;font-size:9px;color:var(--dim);letter-spacing:1px}
+
+.feed{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:6px;min-height:0}
+.feed::-webkit-scrollbar{width:2px}
+.feed::-webkit-scrollbar-thumb{background:var(--b2)}
+
+/* Message */
+.msg{display:flex;gap:9px;animation:slideIn 0.2s ease both}
+@keyframes slideIn{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
+
+.av{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;font-family:var(--sans);font-weight:700}
+.av-analyst{color:var(--accent);border:1px solid rgba(0,255,179,0.2);background:rgba(0,255,179,0.04)}
+.av-news{color:var(--accent2);border:1px solid rgba(0,153,255,0.2);background:rgba(0,153,255,0.04)}
+.av-risk{color:var(--danger);border:1px solid rgba(255,61,90,0.2);background:rgba(255,61,90,0.04)}
+.av-exec{color:var(--warn);border:1px solid rgba(255,184,0,0.2);background:rgba(255,184,0,0.04)}
 
 .msg-body{flex:1;min-width:0}
-.msg-meta{display:flex;align-items:baseline;gap:7px;margin-bottom:3px;flex-wrap:wrap}
-.msg-name{font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase}
-.name-analyst{color:var(--accent)}.name-news{color:var(--accent2)}.name-risk{color:var(--danger)}.name-exec{color:var(--warn)}
-.msg-skill{font-size:9px;color:var(--muted);letter-spacing:0.5px;opacity:0.8}
-.msg-time{font-size:9px;color:var(--muted2);margin-left:auto}
+.msg-head{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
+.msg-name{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.mn-analyst{color:var(--accent)}.mn-news{color:var(--accent2)}.mn-risk{color:var(--danger)}.mn-exec{color:var(--warn)}
+.msg-tag{font-size:8px;color:var(--dim);letter-spacing:0.5px;padding:1px 5px;border:1px solid var(--b1)}
+.msg-ts{font-size:8px;color:var(--dim);margin-left:auto}
 
-.msg-text{font-size:11px;color:var(--text);line-height:1.65;background:var(--surface2);border:1px solid var(--border);border-radius:0 7px 7px 7px;padding:6px 10px;word-break:break-word}
-.msg-text.challenge{border-left:2px solid var(--danger);border-color:var(--danger);background:#ff4e6a08}
-.msg-text.interrupt{border-left:2px solid #ff4e6a80;background:#ff4e6a05}
-.msg-text.exec-text{border-color:#f5c54240;background:#f5c54208}
-.msg-text.defend{border-left:2px solid #00e5a050;background:#00e5a008}
+.bubble{font-size:11px;color:var(--text);line-height:1.65;padding:7px 10px;border-left:2px solid transparent;background:var(--s2)}
+.bubble.neutral{border-color:var(--b2)}
+.bubble.challenge{border-color:var(--danger);background:rgba(255,61,90,0.04)}
+.bubble.interrupt{border-color:rgba(255,61,90,0.4);background:rgba(255,61,90,0.03)}
+.bubble.defend{border-color:rgba(0,255,179,0.3);background:rgba(0,255,179,0.03)}
+.bubble.exec-b{border-color:var(--warn);background:rgba(255,184,0,0.04)}
 
-.typing-msg .msg-text{color:var(--muted)}
-.typing-dots{display:inline-flex;gap:4px;align-items:center}
-.typing-dots i{width:4px;height:4px;border-radius:50%;background:var(--muted);display:inline-block;animation:td 1s infinite}
-.typing-dots i:nth-child(2){animation-delay:0.2s}.typing-dots i:nth-child(3){animation-delay:0.4s}
-@keyframes td{0%,100%{opacity:0.2;transform:scale(0.8)}50%{opacity:1;transform:scale(1)}}
+.typing-bubble{display:inline-flex;gap:3px;align-items:center;padding:7px 10px;background:var(--s2);border-left:2px solid var(--b2)}
+.td{width:3px;height:3px;border-radius:50%;background:var(--muted);animation:td 1s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes td{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
 
-.session-divider{display:flex;align-items:center;gap:8px;padding:4px 0;margin:2px 0}
-.session-line{flex:1;height:1px;background:var(--border)}
-.session-label{font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+.divider{display:flex;align-items:center;gap:8px;padding:3px 0}
+.div-line{flex:1;height:1px;background:var(--b1)}
+.div-label{font-size:8px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
 
-/* Verdict — full trade plan */
-.verdict{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:8px;transition:border-color 0.4s,background 0.3s}
-.verdict.live{border-color:#00e5a040;background:var(--surface2)}
-.verdict-header{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
-.verdict-title{font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.verdict-asset{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--accent);margin-left:auto;letter-spacing:2px}
+/* ── Verdict panel ── */
+.verdict-panel{flex-shrink:0;background:var(--s1);border-top:1px solid var(--b1)}
+.verdict-bar{display:flex;align-items:center;gap:10px;padding:0 16px;height:34px;border-bottom:1px solid var(--b1)}
+.verdict-bar-title{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.verdict-asset{font-size:10px;color:var(--accent);letter-spacing:2px;font-family:var(--sans);font-weight:700}
+.verdict-gen{font-size:8px;color:var(--dim);margin-left:auto;letter-spacing:1px}
 
-/* Top row — action + confidence + risk */
-.verdict-top-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:8px}
-/* Price row — entry + tp + sl */
-.verdict-price-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
-/* Bottom row — size + validity */
-.verdict-bot-row{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-bottom:12px}
+.verdict-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;gap:0;border-bottom:1px solid var(--b1)}
+.vc{padding:10px 12px;border-right:1px solid var(--b1);min-width:0}
+.vc:last-child{border-right:none}
+.vc-label{font-size:8px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.vc-val{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--dim);line-height:1;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vc-val.buy{color:var(--accent)}.vc-val.sell{color:var(--danger)}.vc-val.notrade{color:var(--warn)}
+.vc-val.low{color:var(--accent)}.vc-val.med{color:var(--warn)}.vc-val.high{color:var(--danger)}
+.vc-val.neutral{color:var(--text)}
+.vc-val.entry{font-size:13px;color:var(--text)}
+.vc-val.tp{font-size:13px;color:var(--accent)}
+.vc-val.sl{font-size:13px;color:var(--danger)}
+.vc-val.sz{font-size:15px;color:var(--warn)}
+.vc-sub{font-size:8px;color:var(--muted);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-.vm{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 12px}
-.vm-label{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
-.vm-val{font-family:var(--sans);font-weight:800;font-size:20px;color:var(--muted2);transition:color 0.3s;line-height:1.1}
-.vm-val.buy{color:var(--accent)}.vm-val.sell{color:var(--danger)}.vm-val.wait{color:var(--warn)}
-.vm-val.low{color:var(--accent)}.vm-val.medium{color:var(--warn)}.vm-val.high{color:var(--danger)}.vm-val.neutral{color:var(--text)}
-.vm-sub{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.5}
-.vm-val.price-val{font-size:16px;color:var(--text)}
-.vm-val.price-tp{font-size:16px;color:var(--accent)}
-.vm-val.price-sl{font-size:16px;color:var(--danger)}
-.vm-val.size-val{font-size:18px;color:var(--warn)}
+.verdict-reason-bar{padding:8px 16px;display:flex;align-items:flex-start;gap:8px}
+.vr-label{font-size:8px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;white-space:nowrap;margin-top:2px}
+.vr-text{font-size:11px;color:var(--muted);line-height:1.6;flex:1}
+.vr-text.live{color:var(--text)}
 
-.verdict-reason{font-size:11.5px;color:var(--muted);line-height:1.75;padding-top:10px;border-top:1px solid var(--border);transition:color 0.3s}
-.verdict-reason.live{color:var(--text)}
-.verdict-footer{font-size:9px;color:var(--muted2);margin-top:8px;text-align:right;letter-spacing:1px}
+/* log strip */
+.logstrip{grid-column:1/-1;height:24px;display:flex;align-items:center;gap:8px;padding:0 16px;background:var(--bg);border-top:1px solid var(--b1);font-size:9px;color:var(--dim);letter-spacing:0.5px}
+.log-tag{color:var(--accent);letter-spacing:2px;flex-shrink:0}
 
-.logbar{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;display:flex;gap:10px;align-items:center;font-size:10px;color:var(--muted);letter-spacing:0.5px}
-.log-tag{color:var(--accent);letter-spacing:2px;font-weight:500;flex-shrink:0}
-.refresh-info{margin-left:auto;font-size:9px;color:var(--muted2);letter-spacing:1px;white-space:nowrap}
-
-.footer{text-align:center;font-size:9px;color:var(--muted2);margin-top:10px;letter-spacing:1px}
-
-@media(max-width:620px){
-  .market-strip{grid-template-columns:1fr 1fr}
-  .verdict-top-row,.verdict-price-row,.verdict-bot-row{grid-template-columns:1fr 1fr}
-  .coin-bar{flex-wrap:wrap}
-  .run{margin-left:0;width:100%;text-align:center}
-}
+/* scrollbar global */
+::-webkit-scrollbar{width:2px;height:2px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--b2)}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="shell">
 
-  <div class="header">
-    <div class="logo">FSL Trading Desk <span>MULTI-AGENT v2</span></div>
-    <div class="status-pill"><div class="dot"></div><span id="statusText">LOADING</span></div>
-  </div>
-
-  <div class="badges">
-    <div class="badge"><b>●</b> Bitget Market Data Skill</div>
-    <div class="badge"><b>●</b> Bitget Sentiment Skill</div>
-    <div class="badge"><b>●</b> Bitget Technical Signal Skill</div>
-    <div class="badge"><b>●</b> Bitget Risk Assessment Skill</div>
-    <div class="badge"><b>●</b> Groq LLaMA 3.3 · Multi-Agent Consensus Engine</div>
-  </div>
-
-  <div class="coin-bar">
-    <div class="coin active" data-coin="BTC" onclick="selectCoin(this)">BTC<span class="coin-price" id="p-BTC">—</span><span class="coin-change" id="c-BTC"></span></div>
-    <div class="coin" data-coin="ETH" onclick="selectCoin(this)">ETH<span class="coin-price" id="p-ETH">—</span><span class="coin-change" id="c-ETH"></span></div>
-    <div class="coin" data-coin="SOL" onclick="selectCoin(this)">SOL<span class="coin-price" id="p-SOL">—</span><span class="coin-change" id="c-SOL"></span></div>
-    <button class="run" id="runBtn" onclick="runDesk()">CONVENE DESK</button>
-  </div>
-
-  <div class="market-strip">
-    <div class="metric"><div class="metric-label">Price</div><div class="metric-val" id="m-price">—</div><div class="metric-sub" id="m-bidask">—</div></div>
-    <div class="metric"><div class="metric-label">24h Change</div><div class="metric-val" id="m-change">—</div><div class="metric-sub" id="m-openclose">—</div></div>
-    <div class="metric"><div class="metric-label">24h Volume</div><div class="metric-val" id="m-vol">—</div><div class="metric-sub" id="m-volbase">—</div></div>
-    <div class="metric"><div class="metric-label">Funding Rate</div><div class="metric-val" id="m-fund">—</div><div class="metric-sub" id="m-fundlabel">perpetual futures</div></div>
-  </div>
-
-  <div class="panel-wrap">
-    <div class="panel-header">
-      <div class="panel-title">Agent Debate Room</div>
-      <div class="exchange-count" id="exchangeCount">0 exchanges</div>
-      <div class="panel-meta" id="panelMeta">Idle — convene to begin</div>
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="tb-logo">FSL<span>TRADING DESK</span></div>
+    <div class="tb-coin-bar">
+      <div class="tb-coin active" data-coin="BTC" onclick="selectCoin(this)">
+        BTC<div class="tb-price" id="p-BTC">—</div><div class="tb-chg" id="c-BTC"></div>
+      </div>
+      <div class="tb-coin" data-coin="ETH" onclick="selectCoin(this)">
+        ETH<div class="tb-price" id="p-ETH">—</div><div class="tb-chg" id="c-ETH"></div>
+      </div>
+      <div class="tb-coin" data-coin="SOL" onclick="selectCoin(this)">
+        SOL<div class="tb-price" id="p-SOL">—</div><div class="tb-chg" id="c-SOL"></div>
+      </div>
     </div>
-    <div class="debate-feed" id="debateFeed">
-      <div style="color:var(--muted);font-size:11px;padding:8px 0;">Select a coin and hit CONVENE DESK to open the session.</div>
+    <div class="tb-right">
+      <div class="tb-status"><div class="tb-dot"></div><span id="statusText">LOADING</span></div>
+      <div class="tb-time" id="tbTime">--:--:--</div>
+      <button class="run-btn" id="runBtn" onclick="runDesk()">CONVENE</button>
     </div>
   </div>
 
-  <div class="verdict" id="verdict">
-    <div class="verdict-header">
-      <div class="verdict-title">Trade Plan — Execution Output</div>
-      <div class="verdict-asset" id="verdictAsset">—</div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Market Data</div>
+      <div class="big-price" id="s-price">—</div>
+      <div class="big-chg" id="s-chg">—</div>
     </div>
 
-    <div class="verdict-top-row">
-      <div class="vm"><div class="vm-label">Action</div><div class="vm-val" id="v-action">—</div></div>
-      <div class="vm"><div class="vm-label">Confidence</div><div class="vm-val neutral" id="v-conf">—</div></div>
-      <div class="vm"><div class="vm-label">Risk Level</div><div class="vm-val" id="v-risk">—</div></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Statistics</div>
+      <div class="stat-row"><span class="stat-key">24h High</span><span class="stat-val" id="s-high">—</span></div>
+      <div class="stat-row"><span class="stat-key">24h Low</span><span class="stat-val" id="s-low">—</span></div>
+      <div class="stat-row"><span class="stat-key">Open</span><span class="stat-val" id="s-open">—</span></div>
+      <div class="stat-row"><span class="stat-key">Bid</span><span class="stat-val" id="s-bid">—</span></div>
+      <div class="stat-row"><span class="stat-key">Ask</span><span class="stat-val" id="s-ask">—</span></div>
     </div>
 
-    <div class="verdict-price-row">
-      <div class="vm"><div class="vm-label">Entry</div><div class="vm-val price-val" id="v-entry">—</div><div class="vm-sub" id="v-entry-why">—</div></div>
-      <div class="vm"><div class="vm-label">Take Profit</div><div class="vm-val price-tp" id="v-tp">—</div><div class="vm-sub" id="v-tp-why">—</div></div>
-      <div class="vm"><div class="vm-label">Stop Loss</div><div class="vm-val price-sl" id="v-sl">—</div><div class="vm-sub" id="v-sl-why">—</div></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Volume &amp; Futures</div>
+      <div class="stat-row"><span class="stat-key">USDT Vol</span><span class="stat-val" id="s-vol">—</span></div>
+      <div class="stat-row"><span class="stat-key">Base Vol</span><span class="stat-val" id="s-bvol">—</span></div>
+      <div class="stat-row"><span class="stat-key">Funding</span><span class="stat-val" id="s-fund">—</span></div>
+      <div class="stat-row"><span class="stat-key">Mark Price</span><span class="stat-val" id="s-mark">—</span></div>
+      <div class="stat-row"><span class="stat-key">Open Int.</span><span class="stat-val" id="s-oi">—</span></div>
     </div>
 
-    <div class="verdict-bot-row">
-      <div class="vm"><div class="vm-label">Position Size</div><div class="vm-val size-val" id="v-pos">—</div><div class="vm-sub" id="v-pos-why">—</div></div>
-      <div class="vm"><div class="vm-label">Trade Validity</div><div class="vm-val neutral" style="font-size:12px;line-height:1.4" id="v-validity">—</div></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">AgentHub Skills</div>
+      <div class="skill-badge"><div class="skill-dot sd-analyst"></div>Market Data Skill</div>
+      <div class="skill-badge"><div class="skill-dot sd-news"></div>Sentiment Analysis Skill</div>
+      <div class="skill-badge"><div class="skill-dot sd-risk"></div>Risk Assessment Skill</div>
+      <div class="skill-badge"><div class="skill-dot sd-exec"></div>Execution Skill</div>
     </div>
 
-    <div class="verdict-reason" id="v-reason">Agent debate pending. Convene the desk to generate a live trade plan.</div>
-    <div class="verdict-footer" id="v-footer"></div>
+    <div class="refresh-bar">
+      <div class="refresh-label">DATA REFRESH <span id="refreshLabel">—</span></div>
+      <div class="refresh-track"><div class="refresh-fill" id="refreshFill" style="width:100%"></div></div>
+    </div>
   </div>
 
-  <div class="logbar">
+  <!-- Main -->
+  <div class="main">
+    <div class="debate-panel">
+      <div class="panel-bar">
+        <div class="panel-bar-title">Agent Debate Room</div>
+        <div class="xcount" id="xcount">0 exchanges</div>
+        <div class="panel-bar-right" id="panelMeta">Idle</div>
+      </div>
+      <div class="feed" id="feed">
+        <div style="color:var(--muted);font-size:11px;padding:8px 0;opacity:0.6;">Select a coin and hit CONVENE to open the session.</div>
+      </div>
+    </div>
+
+    <div class="verdict-panel">
+      <div class="verdict-bar">
+        <div class="verdict-bar-title">Trade Plan</div>
+        <div class="verdict-asset" id="vAsset">—</div>
+        <div class="verdict-gen" id="vGen"></div>
+      </div>
+      <div class="verdict-grid">
+        <div class="vc">
+          <div class="vc-label">Action</div>
+          <div class="vc-val" id="v-action">—</div>
+          <div class="vc-sub" id="v-conf-sub">Confidence —</div>
+        </div>
+        <div class="vc">
+          <div class="vc-label">Risk Level</div>
+          <div class="vc-val" id="v-risk">—</div>
+          <div class="vc-sub" id="v-pos">Size —</div>
+        </div>
+        <div class="vc">
+          <div class="vc-label">Entry</div>
+          <div class="vc-val entry" id="v-entry">—</div>
+          <div class="vc-sub" id="v-entry-why">—</div>
+        </div>
+        <div class="vc">
+          <div class="vc-label">Take Profit</div>
+          <div class="vc-val tp" id="v-tp">—</div>
+          <div class="vc-sub" id="v-tp-why">—</div>
+        </div>
+        <div class="vc">
+          <div class="vc-label">Stop Loss</div>
+          <div class="vc-val sl" id="v-sl">—</div>
+          <div class="vc-sub" id="v-sl-why">—</div>
+        </div>
+        <div class="vc" style="grid-column:span 3">
+          <div class="vc-label">Trade Validity</div>
+          <div class="vc-val neutral" style="font-size:11px;white-space:normal;line-height:1.4" id="v-validity">—</div>
+        </div>
+      </div>
+      <div class="verdict-reason-bar">
+        <div class="vr-label">REASON</div>
+        <div class="vr-text" id="v-reason">Agent debate pending.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log strip -->
+  <div class="logstrip">
     <span class="log-tag">SYS</span>
-    <span id="logMsg">Initialising...</span>
-    <span class="refresh-info" id="refreshInfo"></span>
+    <span id="logMsg">Initialising FSL Trading Desk...</span>
   </div>
 
-  <div class="footer">NOT FINANCIAL ADVICE &nbsp;·&nbsp; FSL TRADING DESK v2.0 &nbsp;·&nbsp; BITGET AGENTHUB SKILLS + GROQ LLAMA 3.3</div>
 </div>
 
 <script>
-const COINS = {
-  BTC:{spot:'BTCUSDT',futures:'BTCUSDT'},
-  ETH:{spot:'ETHUSDT',futures:'ETHUSDT'},
-  SOL:{spot:'SOLUSDT',futures:'SOLUSDT'}
-};
-let active='BTC', busy=false;
+const COINS={BTC:{spot:'BTCUSDT',futures:'BTCUSDT'},ETH:{spot:'ETHUSDT',futures:'ETHUSDT'},SOL:{spot:'SOLUSDT',futures:'SOLUSDT'}};
+let active='BTC',busy=false,exchangeN=0;
 const mktData={};
-let refreshCountdown=null, nextRefresh=5, exchangeN=0;
+let refreshTimer=null,nextRefresh=5;
 
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-const log=msg=>{document.getElementById('logMsg').textContent=msg};
+const log=t=>{document.getElementById('logMsg').textContent=t};
 const setStatus=t=>{document.getElementById('statusText').textContent=t};
+const nowStr=()=>new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
-function fmt(n,dec=2){
-  if(n==null||isNaN(n))return'—';
-  return n.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
-}
-function fmtVol(v){
-  if(!v||isNaN(v))return'—';
-  if(v>=1e9)return(v/1e9).toFixed(2)+'B';
-  if(v>=1e6)return(v/1e6).toFixed(2)+'M';
-  if(v>=1e3)return(v/1e3).toFixed(1)+'K';
-  return v.toFixed(0);
-}
-function nowStr(){return new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function fmt(n,d=2){if(n==null||isNaN(n))return'—';return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fmtV(v){if(!v||isNaN(v))return'—';if(v>=1e9)return(v/1e9).toFixed(2)+'B';if(v>=1e6)return(v/1e6).toFixed(2)+'M';if(v>=1e3)return(v/1e3).toFixed(1)+'K';return v.toFixed(0)}
+
+// Live clock
+setInterval(()=>{document.getElementById('tbTime').textContent=nowStr()},1000);
 
 async function fetchMarket(coin){
   const{spot,futures}=COINS[coin];
   try{
-    const[sRes,fRes]=await Promise.all([
+    const[sR,fR]=await Promise.all([
       fetch(`https://api.bitget.com/api/v2/spot/market/tickers?symbol=${spot}`),
       fetch(`https://api.bitget.com/api/v2/mix/market/ticker?symbol=${futures}&productType=USDT-FUTURES`)
     ]);
-    const sj=await sRes.json(), fj=await fRes.json();
-    const s=sj?.data?.[0], f=fj?.data?.[0];
+    const sj=await sR.json(),fj=await fR.json();
+    const s=sj?.data?.[0],f=fj?.data?.[0];
     if(!s)return null;
     return{
-      price:    parseFloat(s.lastPr)||0,
-      change:   parseFloat(s.change24h)||0,
-      usdtVol:  parseFloat(s.usdtVolume)||0,
-      baseVol:  parseFloat(s.baseVolume)||0,
-      high:     parseFloat(s.high24h)||0,
-      low:      parseFloat(s.low24h)||0,
-      open:     parseFloat(s.open)||0,
-      bidPr:    parseFloat(s.bidPr)||0,
-      askPr:    parseFloat(s.askPr)||0,
-      fundingRate: f?parseFloat(f.fundingRate)||0:null,
-      markPrice:   f?parseFloat(f.markPrice)||0:null,
+      price:parseFloat(s.lastPr)||0,change:parseFloat(s.change24h)||0,
+      usdtVol:parseFloat(s.usdtVolume)||0,baseVol:parseFloat(s.baseVolume)||0,
+      high:parseFloat(s.high24h)||0,low:parseFloat(s.low24h)||0,open:parseFloat(s.open)||0,
+      bidPr:parseFloat(s.bidPr)||0,askPr:parseFloat(s.askPr)||0,
+      fundingRate:f?parseFloat(f.fundingRate)||0:null,
+      markPrice:f?parseFloat(f.markPrice)||0:null,
       openInterest:f?parseFloat(f.holdingAmount)||0:null
     };
   }catch(e){return null}
 }
 
-function renderStrip(d,coin){
-  const dec=d.price>=100?0:d.price>=1?2:4;
-  document.getElementById('m-price').textContent='$'+fmt(d.price,dec);
-  document.getElementById('m-bidask').textContent=d.bidPr?`bid $${fmt(d.bidPr,dec)} / ask $${fmt(d.askPr,dec)}`:'';
+function dec(price){return price>=100?0:price>=1?2:4}
+function renderSidebar(d,coin){
+  const p=dec(d.price);
+  document.getElementById('s-price').textContent='$'+fmt(d.price,p);
   const pct=d.change*100;
-  const chEl=document.getElementById('m-change');
-  chEl.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';
-  chEl.className='metric-val '+(pct>=0?'up':'down');
-  document.getElementById('m-openclose').textContent=d.open?`open $${fmt(d.open,dec)}`:'';
-  document.getElementById('m-vol').textContent=d.usdtVol>0?'$'+fmtVol(d.usdtVol):'—';
-  document.getElementById('m-volbase').textContent=d.baseVol>0?fmtVol(d.baseVol)+' '+coin:'';
-  const fe=document.getElementById('m-fund');
-  if(d.fundingRate!==null&&!isNaN(d.fundingRate)){
+  const chgEl=document.getElementById('s-chg');
+  chgEl.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';
+  chgEl.className='big-chg '+(pct>=0?'up':'dn');
+  document.getElementById('s-high').textContent='$'+fmt(d.high,p);
+  document.getElementById('s-low').textContent='$'+fmt(d.low,p);
+  document.getElementById('s-open').textContent='$'+fmt(d.open,p);
+  document.getElementById('s-bid').textContent='$'+fmt(d.bidPr,p);
+  document.getElementById('s-ask').textContent='$'+fmt(d.askPr,p);
+  document.getElementById('s-vol').textContent='$'+fmtV(d.usdtVol);
+  document.getElementById('s-bvol').textContent=fmtV(d.baseVol)+' '+coin;
+  const fe=document.getElementById('s-fund');
+  if(d.fundingRate!==null){
     const fr=d.fundingRate*100;
     fe.textContent=(fr>=0?'+':'')+fr.toFixed(4)+'%';
-    fe.className='metric-val '+(fr>0?'down':fr<0?'up':'');
-    document.getElementById('m-fundlabel').textContent=d.markPrice?`mark $${fmt(d.markPrice,dec)}`:'perpetual futures';
-  }else{fe.textContent='—';fe.className='metric-val';}
+    fe.className='stat-val '+(fr>0?'dn':fr<0?'up':'');
+  }else{fe.textContent='—';fe.className='stat-val';}
+  document.getElementById('s-mark').textContent=d.markPrice?'$'+fmt(d.markPrice,p):'—';
+  document.getElementById('s-oi').textContent=d.openInterest?fmtV(d.openInterest):'—';
 }
-
 function updateCoinBtn(coin,d){
   if(!d)return;
-  const dec=d.price>=100?0:d.price>=1?2:4;
-  const pct=(d.change*100).toFixed(2);
-  const p=document.getElementById('p-'+coin);
-  const c=document.getElementById('c-'+coin);
-  if(p)p.textContent='$'+fmt(d.price,dec);
-  if(c){c.textContent=(pct>=0?'+':'')+pct+'%';c.className='coin-change '+(pct>=0?'up':'down');}
+  const p=dec(d.price),pct=(d.change*100).toFixed(2);
+  const pe=document.getElementById('p-'+coin),ce=document.getElementById('c-'+coin);
+  if(pe)pe.textContent='$'+fmt(d.price,p);
+  if(ce){ce.textContent=(pct>=0?'+':'')+pct+'%';ce.className='tb-chg '+(pct>=0?'up':'dn');}
 }
 
 async function loadAll(silent=false){
-  if(!silent)log('Fetching live Bitget data...');
-  const results=await Promise.all(Object.keys(COINS).map(c=>fetchMarket(c).then(d=>({coin:c,data:d}))));
+  if(!silent)log('Fetching Bitget market data...');
+  const res=await Promise.all(Object.keys(COINS).map(c=>fetchMarket(c).then(d=>({coin:c,data:d}))));
   let ok=false;
-  for(const{coin,data}of results){
-    if(data){mktData[coin]=data;updateCoinBtn(coin,data);if(coin===active)renderStrip(data,coin);ok=true;}
+  for(const{coin,data}of res){
+    if(data){mktData[coin]=data;updateCoinBtn(coin,data);if(coin===active)renderSidebar(data,coin);ok=true;}
   }
-  if(!silent)log(ok?'Market data loaded · '+nowStr():'Bitget data unavailable — agents will infer from context.');
+  if(!silent)log(ok?'Live data loaded · '+nowStr():'Bitget unavailable — agents will infer from context.');
 }
 
 function startPolling(){
-  stopPolling();nextRefresh=5;
+  if(refreshTimer)clearInterval(refreshTimer);
+  nextRefresh=5;
+  const fill=document.getElementById('refreshFill');
   const tick=()=>{
-    document.getElementById('refreshInfo').textContent=`refresh in ${nextRefresh}s`;
+    const pct=Math.max(0,(nextRefresh/5)*100);
+    fill.style.width=pct+'%';
+    document.getElementById('refreshLabel').textContent=nextRefresh+'s';
     nextRefresh--;
-    if(nextRefresh<0){
-      nextRefresh=5;
-      loadAll(true).then(()=>document.getElementById('refreshInfo').textContent='updated '+nowStr());
-    }
+    if(nextRefresh<0){nextRefresh=5;loadAll(true);}
   };
-  tick();refreshCountdown=setInterval(tick,1000);
+  tick();refreshTimer=setInterval(tick,1000);
 }
-function stopPolling(){if(refreshCountdown)clearInterval(refreshCountdown);refreshCountdown=null;}
 
 async function selectCoin(el){
-  document.querySelectorAll('.coin').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.tb-coin').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');active=el.dataset.coin;
   const d=mktData[active];
-  if(d)renderStrip(d,active);else await loadAll();
+  if(d)renderSidebar(d,active);else await loadAll();
+  document.getElementById('vAsset').textContent=active;
 }
 
-/* ── Debate feed helpers ── */
+/* ── Feed helpers ── */
 const AGENTS={
-  analyst:{name:'Market Analyst',skill:'Market Data Skill',av:'av-analyst',nc:'name-analyst',icon:'▲'},
-  news:   {name:'News Agent',    skill:'Sentiment Analysis Skill',av:'av-news',nc:'name-news',icon:'◈'},
-  risk:   {name:'Risk Manager',  skill:'Risk Assessment Skill',av:'av-risk',nc:'name-risk',icon:'⬡'},
-  exec:   {name:'Execution Agent',skill:'Execution Skill',av:'av-exec',nc:'name-exec',icon:'◆'}
+  analyst:{name:'Analyst',skill:'Market Data Skill',av:'av-analyst',nc:'mn-analyst',icon:'A'},
+  news:   {name:'News',   skill:'Sentiment Analysis Skill',av:'av-news',nc:'mn-news',icon:'N'},
+  risk:   {name:'Risk',   skill:'Risk Assessment Skill',av:'av-risk',nc:'mn-risk',icon:'R'},
+  exec:   {name:'Exec',   skill:'Execution Skill',av:'av-exec',nc:'mn-exec',icon:'E'}
 };
 
 function clearFeed(){
-  document.getElementById('debateFeed').innerHTML='';
+  document.getElementById('feed').innerHTML='';
   exchangeN=0;
-  document.getElementById('exchangeCount').textContent='0 exchanges';
+  document.getElementById('xcount').textContent='0 exchanges';
 }
 
 function addDivider(label){
-  const feed=document.getElementById('debateFeed');
-  const d=document.createElement('div');
-  d.className='session-divider';
-  d.innerHTML=`<div class="session-line"></div><div class="session-label">${label}</div><div class="session-line"></div>`;
-  feed.appendChild(d);feed.scrollTop=feed.scrollHeight;
+  const f=document.getElementById('feed');
+  const d=document.createElement('div');d.className='divider';
+  d.innerHTML=`<div class="div-line"></div><div class="div-label">${label}</div><div class="div-line"></div>`;
+  f.appendChild(d);f.scrollTop=f.scrollHeight;
 }
 
-function addTyping(agentKey){
-  const feed=document.getElementById('debateFeed');
-  const ag=AGENTS[agentKey];
-  const div=document.createElement('div');
-  div.className='msg typing-msg';div.id='typing-'+agentKey;
-  div.innerHTML=`
-    <div class="msg-avatar ${ag.av}">${ag.icon}</div>
-    <div class="msg-body">
-      <div class="msg-meta">
-        <span class="msg-name ${ag.nc}">${ag.name}</span>
-        <span class="msg-skill">(${ag.skill})</span>
-        <span class="msg-time">${nowStr()}</span>
-      </div>
-      <div class="msg-text"><span class="typing-dots"><i></i><i></i><i></i></span></div>
-    </div>`;
-  feed.appendChild(div);feed.scrollTop=feed.scrollHeight;
+function addTyping(key){
+  const f=document.getElementById('feed'),ag=AGENTS[key];
+  const d=document.createElement('div');d.className='msg';d.id='typing-'+key;
+  d.innerHTML=`<div class="av ${ag.av}">${ag.icon}</div><div class="msg-body"><div class="msg-head"><span class="msg-name ${ag.nc}">${ag.name}</span><span class="msg-tag">${ag.skill}</span><span class="msg-ts">${nowStr()}</span></div><div class="typing-bubble"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  f.appendChild(d);f.scrollTop=f.scrollHeight;
 }
 
-function resolveMsg(agentKey,text,style=''){
-  const existing=document.getElementById('typing-'+agentKey);
-  if(existing)existing.remove();
-  const feed=document.getElementById('debateFeed');
-  const ag=AGENTS[agentKey];
-  const div=document.createElement('div');div.className='msg';
-  div.innerHTML=`
-    <div class="msg-avatar ${ag.av}">${ag.icon}</div>
-    <div class="msg-body">
-      <div class="msg-meta">
-        <span class="msg-name ${ag.nc}">${ag.name}</span>
-        <span class="msg-skill">(${ag.skill})</span>
-        <span class="msg-time">${nowStr()}</span>
-      </div>
-      <div class="msg-text ${style}"></div>
-    </div>`;
-  feed.appendChild(div);
-  const textEl=div.querySelector('.msg-text');
-  let i=0;
-  const iv=setInterval(()=>{
-    textEl.textContent=text.slice(0,i);i+=4;
-    if(i>text.length){textEl.textContent=text;clearInterval(iv);feed.scrollTop=feed.scrollHeight;}
-  },14);
-  exchangeN++;
-  document.getElementById('exchangeCount').textContent=exchangeN+' exchange'+(exchangeN===1?'':'s');
-  feed.scrollTop=feed.scrollHeight;
+function resolveMsg(key,text,style=''){
+  const ex=document.getElementById('typing-'+key);if(ex)ex.remove();
+  const f=document.getElementById('feed'),ag=AGENTS[key];
+  const d=document.createElement('div');d.className='msg';
+  d.innerHTML=`<div class="av ${ag.av}">${ag.icon}</div><div class="msg-body"><div class="msg-head"><span class="msg-name ${ag.nc}">${ag.name}</span><span class="msg-tag">${ag.skill}</span><span class="msg-ts">${nowStr()}</span></div><div class="bubble ${style||'neutral'}"></div></div>`;
+  f.appendChild(d);
+  const b=d.querySelector('.bubble');
+  let i=0;const iv=setInterval(()=>{b.textContent=text.slice(0,i);i+=5;if(i>text.length){b.textContent=text;clearInterval(iv);f.scrollTop=f.scrollHeight;}},12);
+  exchangeN++;document.getElementById('xcount').textContent=exchangeN+' exchange'+(exchangeN===1?'':'s');
+  f.scrollTop=f.scrollHeight;
 }
 
-async function speak(agentKey,text,style='',thinkMs=900){
-  addTyping(agentKey);
-  await wait(thinkMs+Math.random()*300);
-  resolveMsg(agentKey,text,style);
-  await wait(350);
+async function speak(key,text,style,thinkMs=700){
+  addTyping(key);await wait(thinkMs+Math.random()*200);resolveMsg(key,text,style);await wait(300);
 }
 
-function getField(raw,key){
-  const rx=new RegExp(key+'[:\\s]+([^\\n]+)','i');
-  const m=raw.match(rx);return m?m[1].trim():'—';
-}
-function getBlock(raw,key,nextKey){
-  const rx=new RegExp(key+':?\\s*([\\s\\S]*?)(?='+nextKey+':|$)','i');
-  const m=raw.match(rx);return m?m[1].trim():'';
-}
+function getField(raw,key){const m=raw.match(new RegExp(key+'[:\\s]+([^\\n]+)','i'));return m?m[1].trim():'—'}
+function getBlock(raw,from,to){const m=raw.match(new RegExp(from+':?\\s*([\\s\\S]*?)(?='+to+':|$)','i'));return m?m[1].trim():''}
 
-/* Parse exchanges from raw output — each line starting with a tag */
 function parseExchanges(raw){
-  // Find the EXCHANGES block
   const block=getBlock(raw,'EXCHANGES','EXECUTION AGENT JUDGMENT');
   if(!block)return[];
-  const lines=block.split('\n').map(l=>l.trim()).filter(l=>l.length>4);
-  const exchanges=[];
-  for(const line of lines){
+  return block.split('\n').map(l=>l.trim()).filter(l=>l.length>4).reduce((acc,line)=>{
     const m=line.match(/^\[?(ANALYST|NEWS|RISK)\]?[:.]?\s*(.*)/i);
-    if(m){
-      const key=m[1].toLowerCase()==='analyst'?'analyst':m[1].toLowerCase()==='news'?'news':'risk';
-      exchanges.push({agent:key,text:m[2].trim()});
-    }
-  }
-  return exchanges;
+    if(m){const key=m[1].toLowerCase()==='analyst'?'analyst':m[1].toLowerCase()==='news'?'news':'risk';acc.push({agent:key,text:m[2].trim()});}
+    return acc;
+  },[]);
 }
 
-function getStyle(agent,text){
-  if(agent==='risk'){
-    const t=text.toLowerCase();
-    if(t.includes('wrong')||t.includes('disagree')||t.includes('not')||t.includes('flawed')||t.includes('challenge'))return'challenge';
-    return'interrupt';
-  }
-  if(agent==='analyst'&&(text.toLowerCase().includes('still')||text.toLowerCase().includes('hold')))return'defend';
-  if(agent==='exec')return'exec-text';
-  return'';
+function bubbleStyle(agent,text){
+  if(agent==='exec')return'exec-b';
+  if(agent==='risk'){const t=text.toLowerCase();return(t.includes('wrong')||t.includes('invalid')||t.includes('reject')||t.includes('veto')||t.includes('disagree')||t.includes('flawed'))?'challenge':'interrupt';}
+  if(agent==='analyst'&&(text.toLowerCase().includes('still')||text.toLowerCase().includes('hold')||text.toLowerCase().includes('maintain')))return'defend';
+  return'neutral';
 }
 
 async function runDesk(){
-  if(busy)return;
-  busy=true;
+  if(busy)return;busy=true;
   document.getElementById('runBtn').disabled=true;
   setStatus('ACTIVE');
 
   // Reset verdict
-  ['action','conf','risk','entry','tp','sl','pos'].forEach(k=>{
-    const e=document.getElementById('v-'+k);if(e){e.textContent='—';e.className=e.className.replace(/\b(buy|sell|wait|low|medium|high|neutral)\b/g,'');}
-  });
-  ['entry-why','tp-why','sl-why','pos-why','validity','reason'].forEach(k=>{const e=document.getElementById('v-'+k);if(e)e.textContent='—';});
-  document.getElementById('v-reason').classList.remove('live');
-  document.getElementById('verdict').classList.remove('live');
-  document.getElementById('v-footer').textContent='';
-  document.getElementById('verdictAsset').textContent=active;
+  ['v-action','v-risk','v-entry','v-tp','v-sl'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
+  ['v-conf-sub','v-pos','v-entry-why','v-tp-why','v-sl-why','v-validity'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
+  document.getElementById('v-reason').textContent='Agent debate pending.';
+  document.getElementById('v-reason').className='vr-text';
+  document.getElementById('verdict-panel')?.classList?.remove('live');
+  document.getElementById('vGen').textContent='';
+  document.getElementById('vAsset').textContent=active;
   clearFeed();
 
-  log('Fetching fresh Bitget data for '+active+'...');
+  log('Fetching live Bitget data for '+active+'...');
   await loadAll(false);
 
   const d=mktData[active];
-  const dec=d?.price>=100?2:4;
+  const p=dec(d?.price||0);
   const pct=d?(d.change*100).toFixed(2):null;
-  const fr=d?.fundingRate!==null&&!isNaN(d?.fundingRate)?(d.fundingRate*100).toFixed(4)+'%':'unavailable';
+  const fr=d?.fundingRate!==null&&d?.fundingRate!==undefined?(d.fundingRate*100).toFixed(4)+'%':'unavailable';
 
   const dataCtx=d
-    ?`LIVE BITGET MARKET DATA — ${active} (${nowStr()} via Bitget AgentHub Skills):
-Price: $${fmt(d.price,dec)} | 24h Change: ${pct>=0?'+':''}${pct}%
-24h High: $${fmt(d.high,dec)} | 24h Low: $${fmt(d.low,dec)} | Open: $${fmt(d.open,dec)}
-24h USDT Volume: $${fmtVol(d.usdtVol)} | Base Volume: ${fmtVol(d.baseVol)} ${active}
-Bid: $${fmt(d.bidPr,dec)} | Ask: $${fmt(d.askPr,dec)}
-Futures Funding Rate: ${fr}${d.markPrice?` | Mark: $${fmt(d.markPrice,dec)}`:''}${d.openInterest?` | Open Interest: ${fmtVol(d.openInterest)}`:''}`:
-    `No live Bitget data available — agents must flag uncertainty.`;
+    ?`LIVE BITGET MARKET DATA — ${active} [${nowStr()}] via Bitget AgentHub Skills:
+Price: $${fmt(d.price,p)} | 24h Change: ${pct>=0?'+':''}${pct}% | Open: $${fmt(d.open,p)}
+24h High: $${fmt(d.high,p)} | 24h Low: $${fmt(d.low,p)}
+Bid: $${fmt(d.bidPr,p)} | Ask: $${fmt(d.askPr,p)} | Spread: $${fmt(d.askPr-d.bidPr,p)}
+24h USDT Volume: $${fmtV(d.usdtVol)} | Base Volume: ${fmtV(d.baseVol)} ${active}
+Futures Funding Rate: ${fr}${d.markPrice?` | Mark: $${fmt(d.markPrice,p)}`:''}${d.openInterest?` | Open Interest: ${fmtV(d.openInterest)}`:''}
+Range position: price is at ${d.high>d.low?((( d.price-d.low)/(d.high-d.low))*100).toFixed(0):'—'}% of today's range`
+    :`No live Bitget data — agents must flag uncertainty explicitly.`;
 
-  const prompt=`You are the FSL Multi-Agent Trading Desk. Four elite agents debate whether to trade ${active} right now. This is NOT a chatbot. This is a high-stakes trading desk. Be sharp, data-driven, confrontational.
+  const prompt=`You are the FSL Multi-Agent Trading Desk. Agents debate whether to trade ${active} right now.
+This is a real trading desk — sharp, data-driven, confrontational. Not a chatbot.
 
 ${dataCtx}
 
-AGENT ROLES AND HARD RULES:
+AGENT MANDATES:
 
 ANALYST (Market Data Skill):
-- Identify market structure FIRST: is this a trend, range, breakout, or deviation?
-- Name specific liquidity zones or key price levels from the data above.
-- Entry logic must be tied to CONFIRMATION, not assumption.
-- If no structure exists, say exactly: "No clear structure. No trade thesis." and stop pushing.
-- BANNED phrases: "near 24h low is a good entry", "price is moving", "sentiment is positive"
+- Open with market structure: trend / range / breakout / deviation — be specific.
+- Cite actual price levels from data. Name a liquidity zone or key level.
+- Entry must be based on confirmation, not hope.
+- If structure is genuinely absent, say: "No clear structure. No trade." Then accept that.
 
 NEWS (Sentiment Analysis Skill):
-- Only reference SPECIFIC catalysts: major announcements, protocol updates with timeline, macro events.
-- If nothing specific exists, say exactly: "No actionable news catalyst." Do not pad with vague sentiment.
-- Must directly respond to what was just said — no isolated monologues.
+- Cite a specific catalyst if one exists — major announcement, protocol update, macro event.
+- If none exists, say: "No actionable catalyst." and focus on positioning/sentiment data.
+- Always respond directly to what was just said. No solo speeches.
 
 RISK (Risk Assessment Skill):
-- VETO POWER. Risk Manager can kill any trade.
-- Must define INVALIDATION clearly: "Trade invalid if price breaks below $X"
-- Must set CONDITIONS: "Only valid if volume exceeds Y" or "Only if price reclaims Z"
-- If Risk:Reward < 1.5:1 → reject trade explicitly.
-- Must challenge both ANALYST and NEWS at least once each.
-- Can interrupt any time setup looks weak.
+- Challenge at least once each: Analyst AND News.
+- Name a specific invalidation level: "Trade invalid if price breaks $X."
+- Assess R:R ratio using actual entry, TP, SL numbers. If R:R < 1.5 → say so and push back.
+- You have soft veto power — but a strong opposing argument from Analyst can override you.
+- Position size must reflect your concern level.
 
 EXEC (Execution Skill):
-- Judge only. Does not trade. Does not participate in debate.
-- Summarises the strongest FOR argument and strongest AGAINST argument.
-- If disagreement is unresolved or setup is weak → outputs NO TRADE, no exceptions.
-- Only approves trade if: clear structure confirmed + risk defined + conditions met by Risk Manager.
+- You are the judge, not a debater.
+- State: strongest argument FOR the trade, strongest argument AGAINST.
+- Rule: approve only if structure is clear AND risk is defined AND R:R > 1.5.
+- If both sides are balanced → lean toward approving with reduced size and strict conditions.
+- Output NO TRADE only if setup is genuinely weak or Risk Manager's veto was not countered.
 
-ANTI-HALLUCINATION GATE (apply before generating output):
-If ANY of these are true → ACTION must be NO TRADE:
-1. Volume is anomalously low with no catalyst
-2. Market structure is unclear or absent
-3. No specific news catalyst AND technical setup is weak
-4. Risk:Reward ratio < 1.5:1
-5. Risk Manager has not defined a clear invalidation level
-6. Setup feels forced — no genuine edge identified
+CRITICAL TRADE BIAS: The system SHOULD produce trade recommendations when the data supports it.
+Only output NO TRADE if the setup is objectively weak. Do not default to NO TRADE out of caution.
+If structure exists and R:R > 1.5 and risk is defined → APPROVE THE TRADE.
 
-DEBATE FORMAT — STRICT:
-- 10 to 14 total exchanges between ANALYST, NEWS, RISK only.
-- Each exchange = 1–2 lines MAX. Zero monologues.
-- Every agent must directly respond to the previous statement.
-- At least ONE exchange must be a direct strong disagreement where RISK explicitly opposes the trade.
-- RISK can appear multiple times, including interruptions.
-- No agreement without adding new data or reasoning.
-- Tone: sharp, direct, slightly confrontational. No filler. No pleasantries.
-- Each statement must either: attack a weakness OR strengthen position with new data.
+DEBATE: 10–14 exchanges, ANALYST/NEWS/RISK only. 1–2 lines max each. Fast, adversarial, direct.
+Each agent must respond to the previous statement — not speak in isolation.
+RISK challenges, ANALYST/NEWS defend or concede with data. At least one strong disagreement required.
 
-FLOW PATTERN (adapt dynamically, do not copy literally):
-ANALYST opens with structure + key level
-RISK immediately challenges the level or setup logic
-ANALYST defends with specific data or concedes
-NEWS adds catalyst or says no catalyst
-RISK challenges NEWS or raises new concern
-ANALYST or NEWS rebuts
-RISK interrupts if setup still weak
-Continue until 10–14 exchanges total, then EXEC judges.
-
-OUTPUT FORMAT — use EXACTLY these labels, no deviations:
+OUTPUT FORMAT — use EXACTLY these labels:
 
 EXCHANGES:
-[ANALYST]: <1-2 lines — structure + specific level from live data>
-[RISK]: <direct challenge — attack a specific weakness>
-[ANALYST]: <defend with data OR concede>
-[NEWS]: <specific catalyst OR "No actionable news catalyst.">
-[RISK]: <challenge NEWS or raise new concern>
-... continue to 10-14 total exchanges ...
+[ANALYST]: <market structure + specific level from data above>
+[RISK]: <direct challenge>
+[ANALYST]: <defend with data or concede with reasoning>
+[NEWS]: <specific catalyst OR "No actionable catalyst." + positioning note>
+[RISK]: <challenge news>
+[NEWS]: <rebuttal>
+[RISK]: <final concern or accept if countered>
+[ANALYST]: <final position>
+... (up to 14 total)
 
 EXECUTION AGENT JUDGMENT:
-<3 lines max. State strongest FOR argument. State strongest AGAINST argument. Explain why one outweighed the other. Cold and decisive. If unresolved → say "Conflict unresolved. NO TRADE." (Execution Skill)>
+<FOR: strongest argument. AGAINST: strongest argument. Decision logic. 3 lines max. (Execution Skill)>
 
 ASSET: ${active}
 ACTION: Buy / Sell / No Trade
 CONFIDENCE: [0-100%]
 RISK LEVEL: Low / Medium / High
-ENTRY: $[price or N/A]
-ENTRY REASON: [1 line tied to confirmed structure, not assumption]
-TAKE PROFIT: $[price or N/A]
-TP REASON: [1 line — next liquidity zone or structure target]
-STOP LOSS: $[price or N/A]
-SL REASON: [1 line — clear invalidation level from debate]
-POSITION SIZE: [X% of capital — 1-3% if High risk, 3-5% if Medium, up to 8% if Low]
-SIZE REASON: [1 line — must reference Risk Manager's specific concern]
-TRADE VALIDITY: [specific condition + time window e.g. "Valid only if price holds above $X for 1 hour"]
-REASON: [1-2 lines — sharp summary referencing the core debate conflict]
+ENTRY: $[price — must be near current price $${fmt(d?.price,p)}, or N/A]
+ENTRY REASON: [1 line — what confirms the entry]
+TAKE PROFIT: $[price — logical target, or N/A]
+TP REASON: [1 line — structure or liquidity target]
+STOP LOSS: $[price — clear invalidation, or N/A]
+SL REASON: [1 line — why this level matters]
+POSITION SIZE: [X% — High risk: 1-3%, Medium: 3-5%, Low: 5-8%]
+SIZE REASON: [1 line]
+TRADE VALIDITY: [specific condition + time window]
+REASON: [1-2 line sharp summary of the decision]
 
-MANDATORY LOGIC CHECK (apply before writing ACTION):
-- Entry, TP, SL must be mathematically consistent with current price $${fmt(d?.price,dec)}.
-- NO TRADE if forced. NO TRADE if structure absent. NO TRADE if Risk Manager vetoed.
-- If NO TRADE: Entry = N/A, TP = N/A, SL = N/A. Explain in REASON.
-- High risk + unclear setup = max 2% position or NO TRADE.
+MATH RULES:
+- All prices must be consistent with current price $${fmt(d?.price,p)}.
+- For a BUY: Entry < TP, Entry > SL. For a SELL: Entry > TP, Entry < SL.
+- No trade: Entry = N/A, TP = N/A, SL = N/A.
+- If High risk → position size max 3%.
 
-End output with exactly: Generated by Multi-Agent Consensus Engine`;
+End with: Generated by Multi-Agent Consensus Engine`;
 
   try{
-    log('Connecting to Groq agent engine...');
+    log('Connecting to Groq engine...');
     document.getElementById('panelMeta').textContent='Session open · '+active+' · '+nowStr();
 
     const res=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
@@ -580,36 +581,28 @@ End output with exactly: Generated by Multi-Agent Consensus Engine`;
     const data=await res.json();
     const raw=data.content?.[0]?.text||'';
 
-    // Parse exchanges
     const exchanges=parseExchanges(raw);
 
+    addDivider('live debate — '+active);
     if(exchanges.length===0){
-      // Fallback if parsing fails — show raw block
-      addDivider('Agent Debate');
       const block=getBlock(raw,'EXCHANGES','EXECUTION AGENT');
       const lines=block.split('\n').filter(l=>l.trim().length>4);
       for(const line of lines){
         const agent=line.toLowerCase().startsWith('[risk]')?'risk':line.toLowerCase().startsWith('[news]')?'news':'analyst';
         const text=line.replace(/^\[?(ANALYST|NEWS|RISK)\]?[:.]?\s*/i,'').trim();
-        if(text)await speak(agent,text,getStyle(agent,text),600);
+        if(text)await speak(agent,text,bubbleStyle(agent,text),550);
       }
     }else{
-      addDivider('Live Debate — '+exchanges.length+' exchanges');
       for(const ex of exchanges){
         log(AGENTS[ex.agent].name+' speaking...');
-        // Risk interrupts feel faster; analyst/news get slightly more think time
-        const thinkMs = ex.agent==='risk' ? 550 : 700;
-        await speak(ex.agent,ex.text,getStyle(ex.agent,ex.text),thinkMs);
+        await speak(ex.agent,ex.text,bubbleStyle(ex.agent,ex.text),ex.agent==='risk'?500:650);
       }
     }
 
-    // Execution judgment
     const judgment=getBlock(raw,'EXECUTION AGENT JUDGMENT','ASSET');
     if(judgment){
-      await wait(700);
-      addDivider('Execution Agent — Judgment');
-      await speak('exec',judgment,'exec-text',1200);
-      await wait(500);
+      await wait(600);addDivider('execution judgment');
+      await speak('exec',judgment,'exec-b',1000);await wait(400);
     }
 
     // Populate verdict
@@ -623,19 +616,19 @@ End output with exactly: Generated by Multi-Agent Consensus Engine`;
     const sl=getField(raw,'STOP LOSS');
     const slWhy=getField(raw,'SL REASON');
     const pos=getField(raw,'POSITION SIZE');
-    const posWhy=getField(raw,'SIZE REASON');
     const validity=getField(raw,'TRADE VALIDITY');
     const reason=getField(raw,'REASON');
 
+    const isBuy=action.includes('BUY'),isSell=action.includes('SELL');
     const aEl=document.getElementById('v-action');
-    aEl.textContent=action.includes('BUY')?'BUY':action.includes('SELL')?'SELL':'NO TRADE';
-    aEl.className='vm-val '+(action.includes('BUY')?'buy':action.includes('SELL')?'sell':'wait');
-
-    document.getElementById('v-conf').textContent=conf;
+    aEl.textContent=isBuy?'BUY':isSell?'SELL':'NO TRADE';
+    aEl.className='vc-val '+(isBuy?'buy':isSell?'sell':'notrade');
+    document.getElementById('v-conf-sub').textContent='Confidence '+conf;
 
     const rEl=document.getElementById('v-risk');
     rEl.textContent=risk.charAt(0).toUpperCase()+risk.slice(1);
-    rEl.className='vm-val '+(['low','medium','high'].includes(risk)?risk:'neutral');
+    rEl.className='vc-val '+({'low':'low','medium':'med','high':'high'}[risk]||'neutral');
+    document.getElementById('v-pos').textContent='Size '+pos;
 
     document.getElementById('v-entry').textContent=entry;
     document.getElementById('v-entry-why').textContent=entryWhy;
@@ -643,26 +636,22 @@ End output with exactly: Generated by Multi-Agent Consensus Engine`;
     document.getElementById('v-tp-why').textContent=tpWhy;
     document.getElementById('v-sl').textContent=sl;
     document.getElementById('v-sl-why').textContent=slWhy;
-    document.getElementById('v-pos').textContent=pos;
-    document.getElementById('v-pos-why').textContent=posWhy;
     document.getElementById('v-validity').textContent=validity;
 
     const vrEl=document.getElementById('v-reason');
-    vrEl.textContent=reason;vrEl.classList.add('live');
-    document.getElementById('verdict').classList.add('live');
-    document.getElementById('v-footer').textContent='Generated by Multi-Agent Consensus Engine';
+    vrEl.textContent=reason;vrEl.className='vr-text live';
+    document.getElementById('vGen').textContent='Generated by Multi-Agent Consensus Engine';
 
-    const verdict=action.includes('BUY')?'BUY':action.includes('SELL')?'SELL':'NO TRADE';
-    log('Session complete — '+active+': '+verdict+' · '+conf+' confidence · '+nowStr());
-    document.getElementById('panelMeta').textContent='Session closed · '+nowStr();
-    setStatus('COMPLETE');
+    const verdict=isBuy?'BUY':isSell?'SELL':'NO TRADE';
+    log('Session complete — '+active+': '+verdict+' · '+conf+' · '+nowStr());
+    document.getElementById('panelMeta').textContent='Closed · '+nowStr();
+    setStatus('READY');
 
   }catch(e){
     log('ERROR: '+e.message);setStatus('ERROR');console.error(e);
   }
 
-  busy=false;
-  document.getElementById('runBtn').disabled=false;
+  busy=false;document.getElementById('runBtn').disabled=false;
 }
 
 (async()=>{
