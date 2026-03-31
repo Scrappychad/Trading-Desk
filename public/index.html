@@ -17,117 +17,120 @@
   --mono:'DM Mono',monospace;--sans:'Syne',sans-serif;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.5;min-height:100vh}
-.app{max-width:920px;margin:0 auto;padding:24px 18px}
+.app{max-width:940px;margin:0 auto;padding:24px 18px}
 
-/* Header */
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .logo{font-family:var(--sans);font-size:15px;font-weight:800;letter-spacing:1px;color:var(--accent)}
 .logo span{color:var(--muted);font-weight:400;font-size:11px;margin-left:10px;letter-spacing:2px}
 .status-pill{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:10px;color:var(--muted);letter-spacing:1px}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-/* Skill badges */
 .badges{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
 .badge{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:3px 9px;font-size:9px;color:var(--muted);letter-spacing:1px}
 .badge b{color:var(--accent);font-weight:500}
 
-/* Coin bar */
-.coin-bar{display:flex;gap:8px;margin-bottom:18px;align-items:center;flex-wrap:wrap}
+.coin-bar{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
 .coin{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-family:var(--sans);font-weight:700;font-size:13px;letter-spacing:1.5px;color:var(--muted);cursor:pointer;transition:all 0.15s;min-width:80px}
 .coin:hover{border-color:var(--border2);color:var(--text)}
 .coin.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
 .coin-price{font-family:var(--mono);font-size:10px;font-weight:300;display:block;margin-top:2px;opacity:0.7}
 .coin-change{font-size:9px;display:block;margin-top:1px}
-.coin-change.up{color:var(--accent)}
-.coin-change.down{color:var(--danger)}
+.coin-change.up{color:var(--accent)}.coin-change.down{color:var(--danger)}
 
 .run{margin-left:auto;background:var(--accent);border:none;border-radius:8px;padding:10px 24px;font-family:var(--sans);font-weight:700;font-size:12px;letter-spacing:2px;color:#07090d;cursor:pointer;transition:all 0.15s;text-transform:uppercase;white-space:nowrap}
 .run:hover{opacity:0.88;transform:translateY(-1px)}
 .run:disabled{opacity:0.35;cursor:not-allowed;transform:none}
 
-/* Market strip */
-.market-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+.market-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
 .metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px}
 .metric-label{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
 .metric-val{font-family:var(--sans);font-size:17px;font-weight:700;color:var(--text);transition:color 0.3s}
-.metric-val.up{color:var(--accent)}
-.metric-val.down{color:var(--danger)}
+.metric-val.up{color:var(--accent)}.metric-val.down{color:var(--danger)}
 .metric-sub{font-size:9px;color:var(--muted);margin-top:2px}
 
-/* Panel / debate area */
+/* Panel */
 .panel-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
-.panel-header{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.panel-header{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
 .panel-title{font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.exchange-count{font-size:10px;color:var(--muted2);background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 8px;letter-spacing:1px}
 .panel-meta{font-size:10px;color:var(--muted2);margin-left:auto;letter-spacing:1px}
 
-.debate-feed{padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:80px}
+.debate-feed{padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-height:80px;max-height:520px;overflow-y:auto}
+.debate-feed::-webkit-scrollbar{width:3px}
+.debate-feed::-webkit-scrollbar-track{background:transparent}
+.debate-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-.msg{display:flex;gap:10px;animation:fadeUp 0.35s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg{display:flex;gap:10px;animation:fadeUp 0.3s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 
-.msg-avatar{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px}
-.av-analyst{background:#00e5a015;color:var(--accent);border:1px solid #00e5a030}
-.av-news{background:#3d9bff15;color:var(--accent2);border:1px solid #3d9bff30}
-.av-risk{background:#ff4e6a15;color:var(--danger);border:1px solid #ff4e6a30}
-.av-exec{background:#f5c54215;color:var(--warn);border:1px solid #f5c54230}
+.msg-avatar{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px}
+.av-analyst{background:#00e5a015;color:var(--accent);border:1px solid #00e5a025}
+.av-news{background:#3d9bff15;color:var(--accent2);border:1px solid #3d9bff25}
+.av-risk{background:#ff4e6a15;color:var(--danger);border:1px solid #ff4e6a25}
+.av-exec{background:#f5c54215;color:var(--warn);border:1px solid #f5c54225}
 
 .msg-body{flex:1;min-width:0}
-.msg-meta{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.msg-meta{display:flex;align-items:baseline;gap:7px;margin-bottom:3px;flex-wrap:wrap}
 .msg-name{font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase}
-.name-analyst{color:var(--accent)}
-.name-news{color:var(--accent2)}
-.name-risk{color:var(--danger)}
-.name-exec{color:var(--warn)}
-.msg-skill{font-size:9px;color:var(--muted);letter-spacing:0.5px}
+.name-analyst{color:var(--accent)}.name-news{color:var(--accent2)}.name-risk{color:var(--danger)}.name-exec{color:var(--warn)}
+.msg-skill{font-size:9px;color:var(--muted);letter-spacing:0.5px;opacity:0.8}
 .msg-time{font-size:9px;color:var(--muted2);margin-left:auto}
-.msg-text{font-size:11.5px;color:var(--text);line-height:1.75;background:var(--surface2);border:1px solid var(--border);border-radius:0 8px 8px 8px;padding:9px 12px}
-.msg-text.challenge{border-color:#ff4e6a30;background:#ff4e6a08}
-.msg-text.exec-text{border-color:#f5c54230;background:#f5c54208}
+
+.msg-text{font-size:11.5px;color:var(--text);line-height:1.75;background:var(--surface2);border:1px solid var(--border);border-radius:0 8px 8px 8px;padding:8px 12px}
+.msg-text.challenge{border-left:2px solid var(--danger);border-color:var(--danger);background:#ff4e6a08}
+.msg-text.interrupt{border-left:2px solid #ff4e6a80;background:#ff4e6a05}
+.msg-text.exec-text{border-color:#f5c54240;background:#f5c54208}
+.msg-text.defend{border-left:2px solid #00e5a050;background:#00e5a008}
 
 .typing-msg .msg-text{color:var(--muted)}
 .typing-dots{display:inline-flex;gap:4px;align-items:center}
 .typing-dots i{width:4px;height:4px;border-radius:50%;background:var(--muted);display:inline-block;animation:td 1s infinite}
-.typing-dots i:nth-child(2){animation-delay:0.2s}
-.typing-dots i:nth-child(3){animation-delay:0.4s}
+.typing-dots i:nth-child(2){animation-delay:0.2s}.typing-dots i:nth-child(3){animation-delay:0.4s}
 @keyframes td{0%,100%{opacity:0.2;transform:scale(0.8)}50%{opacity:1;transform:scale(1)}}
 
-.round-divider{display:flex;align-items:center;gap:8px;padding:6px 0}
-.round-line{flex:1;height:1px;background:var(--border)}
-.round-label{font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+.session-divider{display:flex;align-items:center;gap:8px;padding:4px 0;margin:2px 0}
+.session-line{flex:1;height:1px;background:var(--border)}
+.session-label{font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
 
-/* Verdict */
-.verdict{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:8px;transition:border-color 0.4s,background 0.3s}
+/* Verdict — full trade plan */
+.verdict{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:8px;transition:border-color 0.4s,background 0.3s}
 .verdict.live{border-color:#00e5a040;background:var(--surface2)}
-.verdict-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.verdict-header{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .verdict-title{font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.verdict-coin{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--accent);margin-left:auto}
+.verdict-asset{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--accent);margin-left:auto;letter-spacing:2px}
 
-.verdict-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-.vm{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+/* Top row — action + confidence + risk */
+.verdict-top-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:8px}
+/* Price row — entry + tp + sl */
+.verdict-price-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+/* Bottom row — size + validity */
+.verdict-bot-row{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-bottom:12px}
+
+.vm{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 12px}
 .vm-label{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
-.vm-val{font-family:var(--sans);font-weight:800;font-size:21px;color:var(--muted2);transition:color 0.3s}
-.vm-val.buy{color:var(--accent)}
-.vm-val.sell{color:var(--danger)}
-.vm-val.wait{color:var(--warn)}
-.vm-val.low{color:var(--accent)}
-.vm-val.medium{color:var(--warn)}
-.vm-val.high{color:var(--danger)}
-.vm-val.neutral{color:var(--text)}
+.vm-val{font-family:var(--sans);font-weight:800;font-size:20px;color:var(--muted2);transition:color 0.3s;line-height:1.1}
+.vm-val.buy{color:var(--accent)}.vm-val.sell{color:var(--danger)}.vm-val.wait{color:var(--warn)}
+.vm-val.low{color:var(--accent)}.vm-val.medium{color:var(--warn)}.vm-val.high{color:var(--danger)}.vm-val.neutral{color:var(--text)}
+.vm-sub{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.5}
+.vm-val.price-val{font-size:16px;color:var(--text)}
+.vm-val.price-tp{font-size:16px;color:var(--accent)}
+.vm-val.price-sl{font-size:16px;color:var(--danger)}
+.vm-val.size-val{font-size:18px;color:var(--warn)}
 
 .verdict-reason{font-size:11.5px;color:var(--muted);line-height:1.75;padding-top:10px;border-top:1px solid var(--border);transition:color 0.3s}
 .verdict-reason.live{color:var(--text)}
+.verdict-footer{font-size:9px;color:var(--muted2);margin-top:8px;text-align:right;letter-spacing:1px}
 
-/* Log */
 .logbar{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;display:flex;gap:10px;align-items:center;font-size:10px;color:var(--muted);letter-spacing:0.5px}
 .log-tag{color:var(--accent);letter-spacing:2px;font-weight:500;flex-shrink:0}
 .refresh-info{margin-left:auto;font-size:9px;color:var(--muted2);letter-spacing:1px;white-space:nowrap}
 
 .footer{text-align:center;font-size:9px;color:var(--muted2);margin-top:10px;letter-spacing:1px}
 
-@media(max-width:600px){
+@media(max-width:620px){
   .market-strip{grid-template-columns:1fr 1fr}
-  .verdict-grid{grid-template-columns:1fr 1fr}
+  .verdict-top-row,.verdict-price-row,.verdict-bot-row{grid-template-columns:1fr 1fr}
   .coin-bar{flex-wrap:wrap}
   .run{margin-left:0;width:100%;text-align:center}
 }
@@ -146,72 +149,64 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13
     <div class="badge"><b>●</b> Bitget Sentiment Skill</div>
     <div class="badge"><b>●</b> Bitget Technical Signal Skill</div>
     <div class="badge"><b>●</b> Bitget Risk Assessment Skill</div>
-    <div class="badge"><b>●</b> Claude Agent Engine · Groq LLaMA 3.3</div>
+    <div class="badge"><b>●</b> Groq LLaMA 3.3 · Multi-Agent Consensus Engine</div>
   </div>
 
   <div class="coin-bar">
-    <div class="coin active" data-coin="BTC" onclick="selectCoin(this)">
-      BTC<span class="coin-price" id="p-BTC">—</span><span class="coin-change" id="c-BTC"></span>
-    </div>
-    <div class="coin" data-coin="ETH" onclick="selectCoin(this)">
-      ETH<span class="coin-price" id="p-ETH">—</span><span class="coin-change" id="c-ETH"></span>
-    </div>
-    <div class="coin" data-coin="SOL" onclick="selectCoin(this)">
-      SOL<span class="coin-price" id="p-SOL">—</span><span class="coin-change" id="c-SOL"></span>
-    </div>
+    <div class="coin active" data-coin="BTC" onclick="selectCoin(this)">BTC<span class="coin-price" id="p-BTC">—</span><span class="coin-change" id="c-BTC"></span></div>
+    <div class="coin" data-coin="ETH" onclick="selectCoin(this)">ETH<span class="coin-price" id="p-ETH">—</span><span class="coin-change" id="c-ETH"></span></div>
+    <div class="coin" data-coin="SOL" onclick="selectCoin(this)">SOL<span class="coin-price" id="p-SOL">—</span><span class="coin-change" id="c-SOL"></span></div>
     <button class="run" id="runBtn" onclick="runDesk()">CONVENE DESK</button>
   </div>
 
   <div class="market-strip">
-    <div class="metric">
-      <div class="metric-label">Price</div>
-      <div class="metric-val" id="m-price">—</div>
-      <div class="metric-sub" id="m-bidask">bid / ask</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">24h Change</div>
-      <div class="metric-val" id="m-change">—</div>
-      <div class="metric-sub" id="m-openclose">open / close</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">24h Volume</div>
-      <div class="metric-val" id="m-vol">—</div>
-      <div class="metric-sub" id="m-volbase">base vol</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Funding Rate</div>
-      <div class="metric-val" id="m-fund">—</div>
-      <div class="metric-sub" id="m-fundlabel">perpetual futures</div>
-    </div>
+    <div class="metric"><div class="metric-label">Price</div><div class="metric-val" id="m-price">—</div><div class="metric-sub" id="m-bidask">—</div></div>
+    <div class="metric"><div class="metric-label">24h Change</div><div class="metric-val" id="m-change">—</div><div class="metric-sub" id="m-openclose">—</div></div>
+    <div class="metric"><div class="metric-label">24h Volume</div><div class="metric-val" id="m-vol">—</div><div class="metric-sub" id="m-volbase">—</div></div>
+    <div class="metric"><div class="metric-label">Funding Rate</div><div class="metric-val" id="m-fund">—</div><div class="metric-sub" id="m-fundlabel">perpetual futures</div></div>
   </div>
 
-  <div class="panel-wrap" id="panelWrap">
+  <div class="panel-wrap">
     <div class="panel-header">
       <div class="panel-title">Agent Debate Room</div>
+      <div class="exchange-count" id="exchangeCount">0 exchanges</div>
       <div class="panel-meta" id="panelMeta">Idle — convene to begin</div>
     </div>
     <div class="debate-feed" id="debateFeed">
-      <div style="color:var(--muted);font-size:11px;padding:10px 0;">Select a coin and hit CONVENE DESK to open the session.</div>
+      <div style="color:var(--muted);font-size:11px;padding:8px 0;">Select a coin and hit CONVENE DESK to open the session.</div>
     </div>
   </div>
 
   <div class="verdict" id="verdict">
     <div class="verdict-header">
-      <div class="verdict-title">Execution Output</div>
-      <div class="verdict-coin" id="verdictCoin">—</div>
+      <div class="verdict-title">Trade Plan — Execution Output</div>
+      <div class="verdict-asset" id="verdictAsset">—</div>
     </div>
-    <div class="verdict-grid">
-      <div class="vm"><div class="vm-label">Decision</div><div class="vm-val" id="v-decision">—</div></div>
+
+    <div class="verdict-top-row">
+      <div class="vm"><div class="vm-label">Action</div><div class="vm-val" id="v-action">—</div></div>
       <div class="vm"><div class="vm-label">Confidence</div><div class="vm-val neutral" id="v-conf">—</div></div>
-      <div class="vm"><div class="vm-label">Risk</div><div class="vm-val" id="v-risk">—</div></div>
-      <div class="vm"><div class="vm-label">Position Size</div><div class="vm-val neutral" id="v-pos">—</div></div>
+      <div class="vm"><div class="vm-label">Risk Level</div><div class="vm-val" id="v-risk">—</div></div>
     </div>
-    <div class="verdict-reason" id="v-reason">Agent debate pending. Convene the desk to generate a live verdict.</div>
+
+    <div class="verdict-price-row">
+      <div class="vm"><div class="vm-label">Entry</div><div class="vm-val price-val" id="v-entry">—</div><div class="vm-sub" id="v-entry-why">—</div></div>
+      <div class="vm"><div class="vm-label">Take Profit</div><div class="vm-val price-tp" id="v-tp">—</div><div class="vm-sub" id="v-tp-why">—</div></div>
+      <div class="vm"><div class="vm-label">Stop Loss</div><div class="vm-val price-sl" id="v-sl">—</div><div class="vm-sub" id="v-sl-why">—</div></div>
+    </div>
+
+    <div class="verdict-bot-row">
+      <div class="vm"><div class="vm-label">Position Size</div><div class="vm-val size-val" id="v-pos">—</div><div class="vm-sub" id="v-pos-why">—</div></div>
+      <div class="vm"><div class="vm-label">Trade Validity</div><div class="vm-val neutral" style="font-size:12px;line-height:1.4" id="v-validity">—</div></div>
+    </div>
+
+    <div class="verdict-reason" id="v-reason">Agent debate pending. Convene the desk to generate a live trade plan.</div>
+    <div class="verdict-footer" id="v-footer"></div>
   </div>
 
   <div class="logbar">
     <span class="log-tag">SYS</span>
-    <span id="logMsg">Fetching live Bitget market data...</span>
+    <span id="logMsg">Initialising...</span>
     <span class="refresh-info" id="refreshInfo"></span>
   </div>
 
@@ -220,458 +215,414 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13
 
 <script>
 const COINS = {
-  BTC: { spot: 'BTCUSDT', futures: 'BTCUSDT' },
-  ETH: { spot: 'ETHUSDT', futures: 'ETHUSDT' },
-  SOL: { spot: 'SOLUSDT', futures: 'SOLUSDT' }
+  BTC:{spot:'BTCUSDT',futures:'BTCUSDT'},
+  ETH:{spot:'ETHUSDT',futures:'ETHUSDT'},
+  SOL:{spot:'SOLUSDT',futures:'SOLUSDT'}
 };
-let active = 'BTC';
-let busy = false;
-const mktData = {};
-let pollTimer = null;
-let nextRefresh = 15;
-let refreshCountdown = null;
+let active='BTC', busy=false;
+const mktData={};
+let refreshCountdown=null, nextRefresh=15, exchangeN=0;
 
-const wait = ms => new Promise(r => setTimeout(r, ms));
-const log = msg => { document.getElementById('logMsg').textContent = msg; };
-const setStatus = t => { document.getElementById('statusText').textContent = t; };
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const log=msg=>{document.getElementById('logMsg').textContent=msg};
+const setStatus=t=>{document.getElementById('statusText').textContent=t};
 
-function fmt(n, dec = 2) {
-  if (n == null || isNaN(n)) return '—';
-  return n.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+function fmt(n,dec=2){
+  if(n==null||isNaN(n))return'—';
+  return n.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
 }
-function fmtVol(v) {
-  if (!v || isNaN(v)) return '—';
-  if (v >= 1e9) return (v / 1e9).toFixed(2) + 'B';
-  if (v >= 1e6) return (v / 1e6).toFixed(2) + 'M';
-  if (v >= 1e3) return (v / 1e3).toFixed(1) + 'K';
+function fmtVol(v){
+  if(!v||isNaN(v))return'—';
+  if(v>=1e9)return(v/1e9).toFixed(2)+'B';
+  if(v>=1e6)return(v/1e6).toFixed(2)+'M';
+  if(v>=1e3)return(v/1e3).toFixed(1)+'K';
   return v.toFixed(0);
 }
-function now() {
-  return new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-}
+function nowStr(){return new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'})}
 
-async function fetchMarket(coin) {
-  const { spot, futures } = COINS[coin];
-  try {
-    const [spotRes, futRes] = await Promise.all([
+async function fetchMarket(coin){
+  const{spot,futures}=COINS[coin];
+  try{
+    const[sRes,fRes]=await Promise.all([
       fetch(`https://api.bitget.com/api/v2/spot/market/tickers?symbol=${spot}`),
       fetch(`https://api.bitget.com/api/v2/mix/market/ticker?symbol=${futures}&productType=USDT-FUTURES`)
     ]);
-    const spotJson = await spotRes.json();
-    const futJson = await futRes.json();
-
-    const s = spotJson?.data?.[0];
-    const f = futJson?.data?.[0];
-
-    if (!s) return null;
-
-    // v2 API correct field names
-    const price    = parseFloat(s.lastPr)       || 0;
-    const change   = parseFloat(s.change24h)     || 0; // already decimal e.g. 0.023 = 2.3%
-    const usdtVol  = parseFloat(s.usdtVolume)    || 0; // FIXED: was usdtVol
-    const baseVol  = parseFloat(s.baseVolume)    || 0;
-    const high     = parseFloat(s.high24h)       || 0;
-    const low      = parseFloat(s.low24h)        || 0;
-    const open     = parseFloat(s.open)          || 0;
-    const bidPr    = parseFloat(s.bidPr)         || 0;
-    const askPr    = parseFloat(s.askPr)         || 0;
-
-    // Futures fields — fundingRate direct on ticker in v2
-    const fundingRate   = f ? (parseFloat(f.fundingRate) || 0) : null;
-    const markPrice     = f ? (parseFloat(f.markPrice)   || 0) : null;
-    const openInterest  = f ? (parseFloat(f.holdingAmount) || 0) : null;
-
-    return { price, change, usdtVol, baseVol, high, low, open, bidPr, askPr, fundingRate, markPrice, openInterest };
-  } catch (e) {
-    console.warn('Bitget fetch failed for', coin, e);
-    return null;
-  }
+    const sj=await sRes.json(), fj=await fRes.json();
+    const s=sj?.data?.[0], f=fj?.data?.[0];
+    if(!s)return null;
+    return{
+      price:    parseFloat(s.lastPr)||0,
+      change:   parseFloat(s.change24h)||0,
+      usdtVol:  parseFloat(s.usdtVolume)||0,
+      baseVol:  parseFloat(s.baseVolume)||0,
+      high:     parseFloat(s.high24h)||0,
+      low:      parseFloat(s.low24h)||0,
+      open:     parseFloat(s.open)||0,
+      bidPr:    parseFloat(s.bidPr)||0,
+      askPr:    parseFloat(s.askPr)||0,
+      fundingRate: f?parseFloat(f.fundingRate)||0:null,
+      markPrice:   f?parseFloat(f.markPrice)||0:null,
+      openInterest:f?parseFloat(f.holdingAmount)||0:null
+    };
+  }catch(e){return null}
 }
 
-function renderStrip(d, coin) {
-  const dec = d.price >= 100 ? 0 : d.price >= 1 ? 2 : 4;
-  const pDec = d.price >= 100 ? 2 : 4;
-
-  // Price
-  const priceEl = document.getElementById('m-price');
-  priceEl.textContent = '$' + fmt(d.price, dec);
-  priceEl.className = 'metric-val';
-  const bidAskEl = document.getElementById('m-bidask');
-  bidAskEl.textContent = d.bidPr ? `$${fmt(d.bidPr, dec)} / $${fmt(d.askPr, dec)}` : 'bid / ask';
-
-  // Change — change24h from Bitget is a ratio like 0.023
-  const pct = d.change * 100;
-  const chEl = document.getElementById('m-change');
-  chEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
-  chEl.className = 'metric-val ' + (pct >= 0 ? 'up' : 'down');
-  document.getElementById('m-openclose').textContent = d.open ? `open $${fmt(d.open, dec)}` : '';
-
-  // Volume
-  const volEl = document.getElementById('m-vol');
-  volEl.textContent = d.usdtVol > 0 ? '$' + fmtVol(d.usdtVol) : '—';
-  volEl.className = 'metric-val';
-  document.getElementById('m-volbase').textContent = d.baseVol > 0 ? fmtVol(d.baseVol) + ' ' + coin : '';
-
-  // Funding rate
-  const fundEl = document.getElementById('m-fund');
-  if (d.fundingRate !== null && !isNaN(d.fundingRate)) {
-    const fr = d.fundingRate * 100; // convert to percent
-    fundEl.textContent = (fr >= 0 ? '+' : '') + fr.toFixed(4) + '%';
-    fundEl.className = 'metric-val ' + (fr > 0 ? 'down' : fr < 0 ? 'up' : '');
-    document.getElementById('m-fundlabel').textContent = d.markPrice ? `mark $${fmt(d.markPrice, dec)}` : 'perpetual futures';
-  } else {
-    fundEl.textContent = '—';
-    fundEl.className = 'metric-val';
-  }
+function renderStrip(d,coin){
+  const dec=d.price>=100?0:d.price>=1?2:4;
+  document.getElementById('m-price').textContent='$'+fmt(d.price,dec);
+  document.getElementById('m-bidask').textContent=d.bidPr?`bid $${fmt(d.bidPr,dec)} / ask $${fmt(d.askPr,dec)}`:'';
+  const pct=d.change*100;
+  const chEl=document.getElementById('m-change');
+  chEl.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';
+  chEl.className='metric-val '+(pct>=0?'up':'down');
+  document.getElementById('m-openclose').textContent=d.open?`open $${fmt(d.open,dec)}`:'';
+  document.getElementById('m-vol').textContent=d.usdtVol>0?'$'+fmtVol(d.usdtVol):'—';
+  document.getElementById('m-volbase').textContent=d.baseVol>0?fmtVol(d.baseVol)+' '+coin:'';
+  const fe=document.getElementById('m-fund');
+  if(d.fundingRate!==null&&!isNaN(d.fundingRate)){
+    const fr=d.fundingRate*100;
+    fe.textContent=(fr>=0?'+':'')+fr.toFixed(4)+'%';
+    fe.className='metric-val '+(fr>0?'down':fr<0?'up':'');
+    document.getElementById('m-fundlabel').textContent=d.markPrice?`mark $${fmt(d.markPrice,dec)}`:'perpetual futures';
+  }else{fe.textContent='—';fe.className='metric-val';}
 }
 
-function updateCoinButton(coin, d) {
-  if (!d) return;
-  const dec = d.price >= 100 ? 0 : d.price >= 1 ? 2 : 4;
-  const pct = d.change * 100;
-  const pEl = document.getElementById('p-' + coin);
-  const cEl = document.getElementById('c-' + coin);
-  if (pEl) pEl.textContent = '$' + fmt(d.price, dec);
-  if (cEl) {
-    cEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
-    cEl.className = 'coin-change ' + (pct >= 0 ? 'up' : 'down');
-  }
+function updateCoinBtn(coin,d){
+  if(!d)return;
+  const dec=d.price>=100?0:d.price>=1?2:4;
+  const pct=(d.change*100).toFixed(2);
+  const p=document.getElementById('p-'+coin);
+  const c=document.getElementById('c-'+coin);
+  if(p)p.textContent='$'+fmt(d.price,dec);
+  if(c){c.textContent=(pct>=0?'+':'')+pct+'%';c.className='coin-change '+(pct>=0?'up':'down');}
 }
 
-async function loadAll(silent = false) {
-  if (!silent) log('Fetching live Bitget data for all coins...');
-  const results = await Promise.all(Object.keys(COINS).map(c => fetchMarket(c).then(d => ({ coin: c, data: d }))));
-  let anySuccess = false;
-  for (const { coin, data } of results) {
-    if (data) {
-      mktData[coin] = data;
-      updateCoinButton(coin, data);
-      if (coin === active) renderStrip(data, coin);
-      anySuccess = true;
-    }
+async function loadAll(silent=false){
+  if(!silent)log('Fetching live Bitget data...');
+  const results=await Promise.all(Object.keys(COINS).map(c=>fetchMarket(c).then(d=>({coin:c,data:d}))));
+  let ok=false;
+  for(const{coin,data}of results){
+    if(data){mktData[coin]=data;updateCoinBtn(coin,data);if(coin===active)renderStrip(data,coin);ok=true;}
   }
-  if (!silent) {
-    if (anySuccess) log('Live market data loaded. ' + now());
-    else log('Bitget data unavailable — agents will infer from context.');
-  }
+  if(!silent)log(ok?'Market data loaded · '+nowStr():'Bitget data unavailable — agents will infer from context.');
 }
 
-function startPolling() {
-  stopPolling();
-  nextRefresh = 15;
-  const tick = () => {
-    document.getElementById('refreshInfo').textContent = `auto-refresh in ${nextRefresh}s`;
+function startPolling(){
+  stopPolling();nextRefresh=15;
+  const tick=()=>{
+    document.getElementById('refreshInfo').textContent=`auto-refresh in ${nextRefresh}s`;
     nextRefresh--;
-    if (nextRefresh < 0) {
-      nextRefresh = 15;
-      loadAll(true).then(() => {
-        document.getElementById('refreshInfo').textContent = 'updated ' + now();
-      });
+    if(nextRefresh<0){
+      nextRefresh=15;
+      loadAll(true).then(()=>document.getElementById('refreshInfo').textContent='updated '+nowStr());
     }
   };
-  tick();
-  refreshCountdown = setInterval(tick, 1000);
+  tick();refreshCountdown=setInterval(tick,1000);
+}
+function stopPolling(){if(refreshCountdown)clearInterval(refreshCountdown);refreshCountdown=null;}
+
+async function selectCoin(el){
+  document.querySelectorAll('.coin').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');active=el.dataset.coin;
+  const d=mktData[active];
+  if(d)renderStrip(d,active);else await loadAll();
 }
 
-function stopPolling() {
-  if (refreshCountdown) clearInterval(refreshCountdown);
-  refreshCountdown = null;
-}
-
-async function selectCoin(el) {
-  document.querySelectorAll('.coin').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  active = el.dataset.coin;
-  const d = mktData[active];
-  if (d) renderStrip(d, active);
-  else await loadAll();
-}
-
-// ── Debate rendering helpers ──────────────────────────────────────
-const AGENTS = {
-  analyst: { name: 'Market Analyst', skill: 'Market Data · Technical Signal', av: 'av-analyst', nameClass: 'name-analyst', icon: '▲' },
-  news:    { name: 'News Agent',     skill: 'Sentiment · News Tracking',      av: 'av-news',    nameClass: 'name-news',    icon: '◈' },
-  risk:    { name: 'Risk Manager',   skill: 'Risk Assessment · Macro',        av: 'av-risk',    nameClass: 'name-risk',    icon: '⬡' },
-  exec:    { name: 'Execution Agent',skill: 'Execution · Aggregated Intel',   av: 'av-exec',    nameClass: 'name-exec',    icon: '◆' }
+/* ── Debate feed helpers ── */
+const AGENTS={
+  analyst:{name:'Market Analyst',skill:'Market Data Skill',av:'av-analyst',nc:'name-analyst',icon:'▲'},
+  news:   {name:'News Agent',    skill:'Sentiment Analysis Skill',av:'av-news',nc:'name-news',icon:'◈'},
+  risk:   {name:'Risk Manager',  skill:'Risk Assessment Skill',av:'av-risk',nc:'name-risk',icon:'⬡'},
+  exec:   {name:'Execution Agent',skill:'Execution Skill',av:'av-exec',nc:'name-exec',icon:'◆'}
 };
 
-function clearFeed() {
-  document.getElementById('debateFeed').innerHTML = '';
-  document.getElementById('panelMeta').textContent = 'Session starting...';
+function clearFeed(){
+  document.getElementById('debateFeed').innerHTML='';
+  exchangeN=0;
+  document.getElementById('exchangeCount').textContent='0 exchanges';
 }
 
-function addDivider(label) {
-  const feed = document.getElementById('debateFeed');
-  const d = document.createElement('div');
-  d.className = 'round-divider';
-  d.innerHTML = `<div class="round-line"></div><div class="round-label">${label}</div><div class="round-line"></div>`;
-  feed.appendChild(d);
-  feed.scrollTop = feed.scrollHeight;
+function addDivider(label){
+  const feed=document.getElementById('debateFeed');
+  const d=document.createElement('div');
+  d.className='session-divider';
+  d.innerHTML=`<div class="session-line"></div><div class="session-label">${label}</div><div class="session-line"></div>`;
+  feed.appendChild(d);feed.scrollTop=feed.scrollHeight;
 }
 
-function addTyping(agentKey) {
-  const feed = document.getElementById('debateFeed');
-  const ag = AGENTS[agentKey];
-  const div = document.createElement('div');
-  div.className = 'msg typing-msg';
-  div.id = 'typing-' + agentKey;
-  div.innerHTML = `
+function addTyping(agentKey){
+  const feed=document.getElementById('debateFeed');
+  const ag=AGENTS[agentKey];
+  const div=document.createElement('div');
+  div.className='msg typing-msg';div.id='typing-'+agentKey;
+  div.innerHTML=`
     <div class="msg-avatar ${ag.av}">${ag.icon}</div>
     <div class="msg-body">
       <div class="msg-meta">
-        <span class="msg-name ${ag.nameClass}">${ag.name}</span>
-        <span class="msg-skill">${ag.skill}</span>
-        <span class="msg-time">${now()}</span>
+        <span class="msg-name ${ag.nc}">${ag.name}</span>
+        <span class="msg-skill">(${ag.skill})</span>
+        <span class="msg-time">${nowStr()}</span>
       </div>
       <div class="msg-text"><span class="typing-dots"><i></i><i></i><i></i></span></div>
     </div>`;
-  feed.appendChild(div);
-  feed.scrollTop = feed.scrollHeight;
+  feed.appendChild(div);feed.scrollTop=feed.scrollHeight;
 }
 
-function resolveTyping(agentKey, text, isChallenge = false, isExec = false) {
-  const existing = document.getElementById('typing-' + agentKey);
-  if (existing) existing.remove();
-  const feed = document.getElementById('debateFeed');
-  const ag = AGENTS[agentKey];
-  const div = document.createElement('div');
-  div.className = 'msg';
-  const cls = isExec ? 'exec-text' : isChallenge ? 'challenge' : '';
-  div.innerHTML = `
+function resolveMsg(agentKey,text,style=''){
+  const existing=document.getElementById('typing-'+agentKey);
+  if(existing)existing.remove();
+  const feed=document.getElementById('debateFeed');
+  const ag=AGENTS[agentKey];
+  const div=document.createElement('div');div.className='msg';
+  div.innerHTML=`
     <div class="msg-avatar ${ag.av}">${ag.icon}</div>
     <div class="msg-body">
       <div class="msg-meta">
-        <span class="msg-name ${ag.nameClass}">${ag.name}</span>
-        <span class="msg-skill">${ag.skill}</span>
-        <span class="msg-time">${now()}</span>
+        <span class="msg-name ${ag.nc}">${ag.name}</span>
+        <span class="msg-skill">(${ag.skill})</span>
+        <span class="msg-time">${nowStr()}</span>
       </div>
-      <div class="msg-text ${cls}"></div>
+      <div class="msg-text ${style}"></div>
     </div>`;
   feed.appendChild(div);
-  feed.scrollTop = feed.scrollHeight;
-
-  // typewriter
-  const textEl = div.querySelector('.msg-text');
-  let i = 0;
-  const iv = setInterval(() => {
-    textEl.textContent = text.slice(0, i); i += 5;
-    if (i > text.length) { textEl.textContent = text; clearInterval(iv); feed.scrollTop = feed.scrollHeight; }
-  }, 14);
+  const textEl=div.querySelector('.msg-text');
+  let i=0;
+  const iv=setInterval(()=>{
+    textEl.textContent=text.slice(0,i);i+=4;
+    if(i>text.length){textEl.textContent=text;clearInterval(iv);feed.scrollTop=feed.scrollHeight;}
+  },14);
+  exchangeN++;
+  document.getElementById('exchangeCount').textContent=exchangeN+' exchange'+(exchangeN===1?'':'s');
+  feed.scrollTop=feed.scrollHeight;
 }
 
-function extract(raw, from, to) {
-  const rx = new RegExp(from + ':?\\s*([\\s\\S]*?)(?=' + to + ':|$)', 'i');
-  const m = raw.match(rx);
-  return m ? m[1].trim() : '';
-}
-function getField(raw, key) {
-  const rx = new RegExp(key + '[:\\s]+([^\\n]+)', 'i');
-  const m = raw.match(rx);
-  return m ? m[1].trim() : '—';
+async function speak(agentKey,text,style='',thinkMs=900){
+  addTyping(agentKey);
+  await wait(thinkMs+Math.random()*300);
+  resolveMsg(agentKey,text,style);
+  await wait(350);
 }
 
-// Split multi-line text into separate bubbles for a back-and-forth feel
-function splitLines(text) {
-  return text.split('\n').map(l => l.trim()).filter(l => l.length > 10);
+function getField(raw,key){
+  const rx=new RegExp(key+'[:\\s]+([^\\n]+)','i');
+  const m=raw.match(rx);return m?m[1].trim():'—';
+}
+function getBlock(raw,key,nextKey){
+  const rx=new RegExp(key+':?\\s*([\\s\\S]*?)(?='+nextKey+':|$)','i');
+  const m=raw.match(rx);return m?m[1].trim():'';
 }
 
-async function postLines(agentKey, lines, isChallenge = false, isExec = false, delayBetween = 900) {
-  for (let i = 0; i < lines.length; i++) {
-    addTyping(agentKey);
-    await wait(delayBetween + Math.random() * 300);
-    resolveTyping(agentKey, lines[i], isChallenge, isExec);
-    if (i < lines.length - 1) await wait(400);
+/* Parse exchanges from raw output — each line starting with a tag */
+function parseExchanges(raw){
+  // Find the EXCHANGES block
+  const block=getBlock(raw,'EXCHANGES','EXECUTION AGENT JUDGMENT');
+  if(!block)return[];
+  const lines=block.split('\n').map(l=>l.trim()).filter(l=>l.length>4);
+  const exchanges=[];
+  for(const line of lines){
+    const m=line.match(/^\[?(ANALYST|NEWS|RISK)\]?[:.]?\s*(.*)/i);
+    if(m){
+      const key=m[1].toLowerCase()==='analyst'?'analyst':m[1].toLowerCase()==='news'?'news':'risk';
+      exchanges.push({agent:key,text:m[2].trim()});
+    }
   }
+  return exchanges;
 }
 
-async function runDesk() {
-  if (busy) return;
-  busy = true;
-  document.getElementById('runBtn').disabled = true;
+function getStyle(agent,text){
+  if(agent==='risk'){
+    const t=text.toLowerCase();
+    if(t.includes('wrong')||t.includes('disagree')||t.includes('not')||t.includes('flawed')||t.includes('challenge'))return'challenge';
+    return'interrupt';
+  }
+  if(agent==='analyst'&&(text.toLowerCase().includes('still')||text.toLowerCase().includes('hold')))return'defend';
+  if(agent==='exec')return'exec-text';
+  return'';
+}
+
+async function runDesk(){
+  if(busy)return;
+  busy=true;
+  document.getElementById('runBtn').disabled=true;
   setStatus('ACTIVE');
 
   // Reset verdict
-  ['decision','conf','risk','pos'].forEach(k => {
-    const e = document.getElementById('v-' + k);
-    e.textContent = '—';
-    e.className = 'vm-val' + (k === 'conf' || k === 'pos' ? ' neutral' : '');
+  ['action','conf','risk','entry','tp','sl','pos'].forEach(k=>{
+    const e=document.getElementById('v-'+k);if(e){e.textContent='—';e.className=e.className.replace(/\b(buy|sell|wait|low|medium|high|neutral)\b/g,'');}
   });
-  document.getElementById('v-reason').textContent = 'Agent debate in progress...';
+  ['entry-why','tp-why','sl-why','pos-why','validity','reason'].forEach(k=>{const e=document.getElementById('v-'+k);if(e)e.textContent='—';});
   document.getElementById('v-reason').classList.remove('live');
   document.getElementById('verdict').classList.remove('live');
-  document.getElementById('verdictCoin').textContent = active;
-
+  document.getElementById('v-footer').textContent='';
+  document.getElementById('verdictAsset').textContent=active;
   clearFeed();
-  log('Fetching fresh Bitget data for ' + active + '...');
+
+  log('Fetching fresh Bitget data for '+active+'...');
   await loadAll(false);
 
-  const d = mktData[active];
-  const dec = d?.price >= 100 ? 2 : 4;
-  const pct = d ? (d.change * 100).toFixed(2) : null;
-  const fr  = d?.fundingRate !== null && !isNaN(d?.fundingRate) ? (d.fundingRate * 100).toFixed(4) + '%' : 'unavailable';
+  const d=mktData[active];
+  const dec=d?.price>=100?2:4;
+  const pct=d?(d.change*100).toFixed(2):null;
+  const fr=d?.fundingRate!==null&&!isNaN(d?.fundingRate)?(d.fundingRate*100).toFixed(4)+'%':'unavailable';
 
-  const dataCtx = d
-    ? `LIVE BITGET MARKET DATA — ${active} (via Bitget AgentHub Skills, fetched ${now()}):
-Price: $${fmt(d.price, dec)} | 24h Change: ${pct >= 0 ? '+' : ''}${pct}%
-24h High: $${fmt(d.high, dec)} | 24h Low: $${fmt(d.low, dec)} | Open: $${fmt(d.open, dec)}
+  const dataCtx=d
+    ?`LIVE BITGET MARKET DATA — ${active} (${nowStr()} via Bitget AgentHub Skills):
+Price: $${fmt(d.price,dec)} | 24h Change: ${pct>=0?'+':''}${pct}%
+24h High: $${fmt(d.high,dec)} | 24h Low: $${fmt(d.low,dec)} | Open: $${fmt(d.open,dec)}
 24h USDT Volume: $${fmtVol(d.usdtVol)} | Base Volume: ${fmtVol(d.baseVol)} ${active}
-Bid: $${fmt(d.bidPr, dec)} | Ask: $${fmt(d.askPr, dec)}
-Futures Funding Rate: ${fr}${d.markPrice ? ` | Mark Price: $${fmt(d.markPrice, dec)}` : ''}${d.openInterest ? ` | Open Interest: ${fmtVol(d.openInterest)} contracts` : ''}`
-    : `No live Bitget data — agents must flag uncertainty and reason from context.`;
+Bid: $${fmt(d.bidPr,dec)} | Ask: $${fmt(d.askPr,dec)}
+Futures Funding Rate: ${fr}${d.markPrice?` | Mark: $${fmt(d.markPrice,dec)}`:''}${d.openInterest?` | Open Interest: ${fmtVol(d.openInterest)}`:''}`:
+    `No live Bitget data available — agents must flag uncertainty.`;
 
-  const prompt = `You are the FSL Multi-Agent Trading Desk. Four elite agents are debating whether to trade ${active} right now.
+  const prompt=`You are the FSL Multi-Agent Trading Desk. Four elite agents debate whether to trade ${active} right now.
 
 ${dataCtx}
 
-Produce a structured multi-round debate. Format EXACTLY as below — no extra text, no markdown, no asterisks.
+AGENT ROLES:
+- ANALYST: Aggressive. Spots opportunities. Speaks in 1-2 sharp lines. References (Market Data Skill).
+- NEWS: Reactive. Adds macro/narrative context. 1-2 lines. References (Sentiment Analysis Skill).
+- RISK: Skeptical enforcer. Must challenge at least once each. Interrupts when setup looks weak. 1-2 lines. References (Risk Assessment Skill).
+- EXEC: Judge. Speaks last. Summarises the conflict, picks a side, delivers verdict. References (Execution Skill).
 
-ROUND 1 — Opening positions:
+DEBATE RULES:
+- 6 to 10 total exchanges between ANALYST, NEWS, RISK only (not EXEC).
+- Each exchange is exactly 1–2 lines. No monologues.
+- Agents respond to what was just said, not in isolation.
+- At least ONE exchange must be a direct strong disagreement (RISK challenging ANALYST or NEWS).
+- RISK may interrupt multiple times if setup looks weak.
+- No filler. No politeness. Sharp and direct.
+- Dynamic flow example: ANALYST → RISK challenges → ANALYST defends → NEWS adds → RISK interrupts again → NEWS clarifies → ANALYST concedes or holds.
 
-MARKET ANALYST:
-[2-3 sharp lines referencing the actual price, change%, volume and funding rate above. Identify a specific technical signal or pattern.]
+OUTPUT FORMAT — use EXACTLY these labels, no extra text:
 
-NEWS AGENT:
-[2-3 lines on macro/sentiment/narrative for ${active} right now. What external catalysts or risks matter today?]
+EXCHANGES:
+[ANALYST]: <1-2 line statement using actual price/volume/funding data>
+[RISK]: <direct challenge to analyst>
+[ANALYST]: <defend or partially concede>
+[NEWS]: <adds macro/sentiment context>
+[RISK]: <challenges news or interrupts with new concern>
+[NEWS]: <rebuttal or clarification>
+... (continue until 6–10 total exchanges, then stop)
 
-ROUND 2 — Challenge:
+EXECUTION AGENT JUDGMENT:
+<2-3 lines. Act as judge. State who was right, what conflict existed, why one side outweighed the other. Cold, decisive. (Execution Skill)>
 
-RISK MANAGER CHALLENGES ANALYST:
-[2-3 lines directly countering the Market Analyst. Find a flaw in their technical reasoning. Be confrontational and specific.]
-
-RISK MANAGER CHALLENGES NEWS:
-[2 lines directly countering the News Agent. Push back on their narrative with a hard counter-argument.]
-
-ROUND 3 — Rebuttals:
-
-MARKET ANALYST REBUTTAL:
-[2 lines defending their position or partially conceding with a revised view.]
-
-NEWS AGENT REBUTTAL:
-[2 lines responding to the Risk Manager's challenge.]
-
-EXECUTION AGENT SYNTHESIS:
-[2-3 lines. Cold, decisive. Synthesize the debate — who was right, what outweighed what. State the final judgment without hedging.]
-
-FINAL DECISION: Buy / Sell / No Trade
+ASSET: ${active}
+ACTION: Buy / Sell / No Trade
 CONFIDENCE: [0-100%]
 RISK LEVEL: Low / Medium / High
-POSITION SIZE: [% of capital e.g. 3%]
-REASON: [1-2 lines]
+ENTRY: $[price]
+ENTRY REASON: [1 short line]
+TAKE PROFIT: $[price]
+TP REASON: [1 short line]
+STOP LOSS: $[price]
+SL REASON: [1 short line]
+POSITION SIZE: [X% of capital]
+SIZE REASON: [1 short line reflecting Risk Manager concerns]
+TRADE VALIDITY: [condition or time constraint e.g. "Valid only if price holds above $X in next 2 hours"]
+REASON: [1-2 line final summary]
 
-Rules: Sound like elite professionals under pressure. Sharp, slightly confrontational. No fluff. Use the actual numbers from the data above.`;
+LOGIC RULES (mandatory):
+- Entry, TP, SL must be mathematically consistent with current price ($${fmt(d?.price,dec)}).
+- If ACTION is No Trade: set ENTRY, TP, SL to N/A and explain why in REASON.
+- If RISK LEVEL is High: POSITION SIZE must be 1-3% max. If Medium: 3-5%. If Low: up to 8%.
+- Do not force a trade if setup is genuinely weak.
 
-  try {
+End your output with exactly: Generated by Multi-Agent Consensus Engine`;
+
+  try{
     log('Connecting to Groq agent engine...');
-    document.getElementById('panelMeta').textContent = 'Session open — ' + active + ' · ' + now();
+    document.getElementById('panelMeta').textContent='Session open · '+active+' · '+nowStr();
 
-    const res = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
-    });
-    if (!res.ok) throw new Error('Proxy error ' + res.status);
-    const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
+    const res=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    if(!res.ok)throw new Error('Proxy error '+res.status);
+    const data=await res.json();
+    const raw=data.content?.[0]?.text||'';
 
-    // Parse all sections
-    const analystOpen   = extract(raw, 'MARKET ANALYST', 'NEWS AGENT');
-    const newsOpen      = extract(raw, 'NEWS AGENT', 'RISK MANAGER');
-    const riskVsAnlst   = extract(raw, 'RISK MANAGER CHALLENGES ANALYST', 'RISK MANAGER CHALLENGES NEWS');
-    const riskVsNews    = extract(raw, 'RISK MANAGER CHALLENGES NEWS', 'MARKET ANALYST REBUTTAL');
-    const analystReb    = extract(raw, 'MARKET ANALYST REBUTTAL', 'NEWS AGENT REBUTTAL');
-    const newsReb       = extract(raw, 'NEWS AGENT REBUTTAL', 'EXECUTION AGENT');
-    const execSynth     = extract(raw, 'EXECUTION AGENT SYNTHESIS', 'FINAL DECISION');
+    // Parse exchanges
+    const exchanges=parseExchanges(raw);
 
-    // — ROUND 1 —
-    addDivider('Round 1 — Opening Positions');
-    await wait(300);
+    if(exchanges.length===0){
+      // Fallback if parsing fails — show raw block
+      addDivider('Agent Debate');
+      const block=getBlock(raw,'EXCHANGES','EXECUTION AGENT');
+      const lines=block.split('\n').filter(l=>l.trim().length>4);
+      for(const line of lines){
+        const agent=line.toLowerCase().startsWith('[risk]')?'risk':line.toLowerCase().startsWith('[news]')?'news':'analyst';
+        const text=line.replace(/^\[?(ANALYST|NEWS|RISK)\]?[:.]?\s*/i,'').trim();
+        if(text)await speak(agent,text,getStyle(agent,text),800);
+      }
+    }else{
+      addDivider('Live Debate — '+exchanges.length+' Exchanges');
+      for(const ex of exchanges){
+        log(AGENTS[ex.agent].name+' speaking...');
+        await speak(ex.agent,ex.text,getStyle(ex.agent,ex.text),850);
+      }
+    }
 
-    log('Market Analyst opening position...');
-    const aLines = splitLines(analystOpen);
-    await postLines('analyst', aLines.length ? aLines : [analystOpen], false, false, 1000);
-    await wait(600);
+    // Execution judgment
+    const judgment=getBlock(raw,'EXECUTION AGENT JUDGMENT','ASSET');
+    if(judgment){
+      await wait(700);
+      addDivider('Execution Agent — Judgment');
+      await speak('exec',judgment,'exec-text',1200);
+      await wait(500);
+    }
 
-    log('News Agent scanning feeds...');
-    const nLines = splitLines(newsOpen);
-    await postLines('news', nLines.length ? nLines : [newsOpen], false, false, 1000);
-    await wait(800);
+    // Populate verdict
+    const action=getField(raw,'ACTION').toUpperCase();
+    const conf=getField(raw,'CONFIDENCE');
+    const risk=getField(raw,'RISK LEVEL').toLowerCase().trim();
+    const entry=getField(raw,'ENTRY');
+    const entryWhy=getField(raw,'ENTRY REASON');
+    const tp=getField(raw,'TAKE PROFIT');
+    const tpWhy=getField(raw,'TP REASON');
+    const sl=getField(raw,'STOP LOSS');
+    const slWhy=getField(raw,'SL REASON');
+    const pos=getField(raw,'POSITION SIZE');
+    const posWhy=getField(raw,'SIZE REASON');
+    const validity=getField(raw,'TRADE VALIDITY');
+    const reason=getField(raw,'REASON');
 
-    // — ROUND 2 —
-    addDivider('Round 2 — Risk Manager Challenges');
-    await wait(300);
+    const aEl=document.getElementById('v-action');
+    aEl.textContent=action.includes('BUY')?'BUY':action.includes('SELL')?'SELL':'NO TRADE';
+    aEl.className='vm-val '+(action.includes('BUY')?'buy':action.includes('SELL')?'sell':'wait');
 
-    log('Risk Manager challenging the desk...');
-    const r1Lines = splitLines(riskVsAnlst);
-    await postLines('risk', r1Lines.length ? r1Lines : [riskVsAnlst], true, false, 1100);
-    await wait(500);
-    const r2Lines = splitLines(riskVsNews);
-    await postLines('risk', r2Lines.length ? r2Lines : [riskVsNews], true, false, 900);
-    await wait(800);
+    document.getElementById('v-conf').textContent=conf;
 
-    // — ROUND 3 —
-    addDivider('Round 3 — Rebuttals');
-    await wait(300);
+    const rEl=document.getElementById('v-risk');
+    rEl.textContent=risk.charAt(0).toUpperCase()+risk.slice(1);
+    rEl.className='vm-val '+(['low','medium','high'].includes(risk)?risk:'neutral');
 
-    log('Market Analyst rebutting...');
-    const arLines = splitLines(analystReb);
-    await postLines('analyst', arLines.length ? arLines : [analystReb], false, false, 900);
-    await wait(500);
+    document.getElementById('v-entry').textContent=entry;
+    document.getElementById('v-entry-why').textContent=entryWhy;
+    document.getElementById('v-tp').textContent=tp;
+    document.getElementById('v-tp-why').textContent=tpWhy;
+    document.getElementById('v-sl').textContent=sl;
+    document.getElementById('v-sl-why').textContent=slWhy;
+    document.getElementById('v-pos').textContent=pos;
+    document.getElementById('v-pos-why').textContent=posWhy;
+    document.getElementById('v-validity').textContent=validity;
 
-    log('News Agent rebutting...');
-    const nrLines = splitLines(newsReb);
-    await postLines('news', nrLines.length ? nrLines : [newsReb], false, false, 900);
-    await wait(1000);
-
-    // — VERDICT —
-    addDivider('Execution Agent — Final Verdict');
-    await wait(400);
-
-    log('Execution Agent synthesizing verdict...');
-    const eLines = splitLines(execSynth);
-    await postLines('exec', eLines.length ? eLines : [execSynth], false, true, 1200);
-    await wait(600);
-
-    // Populate verdict panel
-    const dec  = getField(raw, 'FINAL DECISION').toUpperCase();
-    const conf = getField(raw, 'CONFIDENCE');
-    const risk = getField(raw, 'RISK LEVEL').toLowerCase().trim();
-    const pos  = getField(raw, 'POSITION SIZE');
-    const reason = getField(raw, 'REASON');
-
-    const dEl = document.getElementById('v-decision');
-    dEl.textContent = dec.includes('BUY') ? 'BUY' : dec.includes('SELL') ? 'SELL' : 'WAIT';
-    dEl.className = 'vm-val ' + (dec.includes('BUY') ? 'buy' : dec.includes('SELL') ? 'sell' : 'wait');
-
-    document.getElementById('v-conf').textContent = conf;
-
-    const rEl = document.getElementById('v-risk');
-    rEl.textContent = risk.charAt(0).toUpperCase() + risk.slice(1);
-    rEl.className = 'vm-val ' + (['low','medium','high'].includes(risk) ? risk : 'neutral');
-
-    document.getElementById('v-pos').textContent = pos;
-
-    const vrEl = document.getElementById('v-reason');
-    vrEl.textContent = reason;
-    vrEl.classList.add('live');
+    const vrEl=document.getElementById('v-reason');
+    vrEl.textContent=reason;vrEl.classList.add('live');
     document.getElementById('verdict').classList.add('live');
+    document.getElementById('v-footer').textContent='Generated by Multi-Agent Consensus Engine';
 
-    const verdict = dec.includes('BUY') ? 'BUY' : dec.includes('SELL') ? 'SELL' : 'NO TRADE';
-    log('Session complete — ' + active + ' verdict: ' + verdict + ' · ' + conf + ' confidence · ' + now());
-    document.getElementById('panelMeta').textContent = 'Session closed · ' + now();
+    const verdict=action.includes('BUY')?'BUY':action.includes('SELL')?'SELL':'NO TRADE';
+    log('Session complete — '+active+': '+verdict+' · '+conf+' confidence · '+nowStr());
+    document.getElementById('panelMeta').textContent='Session closed · '+nowStr();
     setStatus('COMPLETE');
 
-  } catch (e) {
-    log('ERROR: ' + e.message);
-    setStatus('ERROR');
-    console.error(e);
+  }catch(e){
+    log('ERROR: '+e.message);setStatus('ERROR');console.error(e);
   }
 
-  busy = false;
-  document.getElementById('runBtn').disabled = false;
+  busy=false;
+  document.getElementById('runBtn').disabled=false;
 }
 
-// Boot
-(async () => {
+(async()=>{
   setStatus('LOADING');
   await loadAll(false);
   setStatus('READY');
