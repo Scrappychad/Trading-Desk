@@ -3,6 +3,6 @@
   "version": "2.0.0",
   "description": "FSL Multi-Agent Trading Desk — Bitget AgentHub Skills + Claude",
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   }
 }
