@@ -16,8 +16,8 @@
   --text:#e2eaf4;--muted:#4a6880;--muted2:#2a4058;
   --mono:'DM Mono',monospace;--sans:'Syne',sans-serif;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.5;min-height:100vh}
-.app{max-width:940px;margin:0 auto;padding:24px 18px}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;line-height:1.5;min-height:100vh;overflow-x:hidden}
+.app{max-width:860px;margin:0 auto;padding:18px 16px}
 
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .logo{font-family:var(--sans);font-size:15px;font-weight:800;letter-spacing:1px;color:var(--accent)}
@@ -56,15 +56,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13
 .exchange-count{font-size:10px;color:var(--muted2);background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 8px;letter-spacing:1px}
 .panel-meta{font-size:10px;color:var(--muted2);margin-left:auto;letter-spacing:1px}
 
-.debate-feed{padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-height:80px;max-height:520px;overflow-y:auto}
+.debate-feed{padding:10px 14px;display:flex;flex-direction:column;gap:6px;min-height:60px;height:380px;max-height:380px;overflow-y:auto;overflow-x:hidden}
 .debate-feed::-webkit-scrollbar{width:3px}
 .debate-feed::-webkit-scrollbar-track{background:transparent}
 .debate-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-.msg{display:flex;gap:10px;animation:fadeUp 0.3s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.msg{display:flex;gap:8px;animation:fadeUp 0.25s ease both;max-width:100%}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
-.msg-avatar{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px}
+.msg-avatar{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:2px}
 .av-analyst{background:#00e5a015;color:var(--accent);border:1px solid #00e5a025}
 .av-news{background:#3d9bff15;color:var(--accent2);border:1px solid #3d9bff25}
 .av-risk{background:#ff4e6a15;color:var(--danger);border:1px solid #ff4e6a25}
@@ -77,7 +77,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13
 .msg-skill{font-size:9px;color:var(--muted);letter-spacing:0.5px;opacity:0.8}
 .msg-time{font-size:9px;color:var(--muted2);margin-left:auto}
 
-.msg-text{font-size:11.5px;color:var(--text);line-height:1.75;background:var(--surface2);border:1px solid var(--border);border-radius:0 8px 8px 8px;padding:8px 12px}
+.msg-text{font-size:11px;color:var(--text);line-height:1.65;background:var(--surface2);border:1px solid var(--border);border-radius:0 7px 7px 7px;padding:6px 10px;word-break:break-word}
 .msg-text.challenge{border-left:2px solid var(--danger);border-color:var(--danger);background:#ff4e6a08}
 .msg-text.interrupt{border-left:2px solid #ff4e6a80;background:#ff4e6a05}
 .msg-text.exec-text{border-color:#f5c54240;background:#f5c54208}
@@ -221,7 +221,7 @@ const COINS = {
 };
 let active='BTC', busy=false;
 const mktData={};
-let refreshCountdown=null, nextRefresh=15, exchangeN=0;
+let refreshCountdown=null, nextRefresh=5, exchangeN=0;
 
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const log=msg=>{document.getElementById('logMsg').textContent=msg};
@@ -308,12 +308,12 @@ async function loadAll(silent=false){
 }
 
 function startPolling(){
-  stopPolling();nextRefresh=15;
+  stopPolling();nextRefresh=5;
   const tick=()=>{
-    document.getElementById('refreshInfo').textContent=`auto-refresh in ${nextRefresh}s`;
+    document.getElementById('refreshInfo').textContent=`refresh in ${nextRefresh}s`;
     nextRefresh--;
     if(nextRefresh<0){
-      nextRefresh=15;
+      nextRefresh=5;
       loadAll(true).then(()=>document.getElementById('refreshInfo').textContent='updated '+nowStr());
     }
   };
@@ -474,61 +474,102 @@ Bid: $${fmt(d.bidPr,dec)} | Ask: $${fmt(d.askPr,dec)}
 Futures Funding Rate: ${fr}${d.markPrice?` | Mark: $${fmt(d.markPrice,dec)}`:''}${d.openInterest?` | Open Interest: ${fmtVol(d.openInterest)}`:''}`:
     `No live Bitget data available — agents must flag uncertainty.`;
 
-  const prompt=`You are the FSL Multi-Agent Trading Desk. Four elite agents debate whether to trade ${active} right now.
+  const prompt=`You are the FSL Multi-Agent Trading Desk. Four elite agents debate whether to trade ${active} right now. This is NOT a chatbot. This is a high-stakes trading desk. Be sharp, data-driven, confrontational.
 
 ${dataCtx}
 
-AGENT ROLES:
-- ANALYST: Aggressive. Spots opportunities. Speaks in 1-2 sharp lines. References (Market Data Skill).
-- NEWS: Reactive. Adds macro/narrative context. 1-2 lines. References (Sentiment Analysis Skill).
-- RISK: Skeptical enforcer. Must challenge at least once each. Interrupts when setup looks weak. 1-2 lines. References (Risk Assessment Skill).
-- EXEC: Judge. Speaks last. Summarises the conflict, picks a side, delivers verdict. References (Execution Skill).
+AGENT ROLES AND HARD RULES:
 
-DEBATE RULES:
-- 6 to 10 total exchanges between ANALYST, NEWS, RISK only (not EXEC).
-- Each exchange is exactly 1–2 lines. No monologues.
-- Agents respond to what was just said, not in isolation.
-- At least ONE exchange must be a direct strong disagreement (RISK challenging ANALYST or NEWS).
-- RISK may interrupt multiple times if setup looks weak.
-- No filler. No politeness. Sharp and direct.
-- Dynamic flow example: ANALYST → RISK challenges → ANALYST defends → NEWS adds → RISK interrupts again → NEWS clarifies → ANALYST concedes or holds.
+ANALYST (Market Data Skill):
+- Identify market structure FIRST: is this a trend, range, breakout, or deviation?
+- Name specific liquidity zones or key price levels from the data above.
+- Entry logic must be tied to CONFIRMATION, not assumption.
+- If no structure exists, say exactly: "No clear structure. No trade thesis." and stop pushing.
+- BANNED phrases: "near 24h low is a good entry", "price is moving", "sentiment is positive"
 
-OUTPUT FORMAT — use EXACTLY these labels, no extra text:
+NEWS (Sentiment Analysis Skill):
+- Only reference SPECIFIC catalysts: major announcements, protocol updates with timeline, macro events.
+- If nothing specific exists, say exactly: "No actionable news catalyst." Do not pad with vague sentiment.
+- Must directly respond to what was just said — no isolated monologues.
+
+RISK (Risk Assessment Skill):
+- VETO POWER. Risk Manager can kill any trade.
+- Must define INVALIDATION clearly: "Trade invalid if price breaks below $X"
+- Must set CONDITIONS: "Only valid if volume exceeds Y" or "Only if price reclaims Z"
+- If Risk:Reward < 1.5:1 → reject trade explicitly.
+- Must challenge both ANALYST and NEWS at least once each.
+- Can interrupt any time setup looks weak.
+
+EXEC (Execution Skill):
+- Judge only. Does not trade. Does not participate in debate.
+- Summarises the strongest FOR argument and strongest AGAINST argument.
+- If disagreement is unresolved or setup is weak → outputs NO TRADE, no exceptions.
+- Only approves trade if: clear structure confirmed + risk defined + conditions met by Risk Manager.
+
+ANTI-HALLUCINATION GATE (apply before generating output):
+If ANY of these are true → ACTION must be NO TRADE:
+1. Volume is anomalously low with no catalyst
+2. Market structure is unclear or absent
+3. No specific news catalyst AND technical setup is weak
+4. Risk:Reward ratio < 1.5:1
+5. Risk Manager has not defined a clear invalidation level
+6. Setup feels forced — no genuine edge identified
+
+DEBATE FORMAT — STRICT:
+- 10 to 14 total exchanges between ANALYST, NEWS, RISK only.
+- Each exchange = 1–2 lines MAX. Zero monologues.
+- Every agent must directly respond to the previous statement.
+- At least ONE exchange must be a direct strong disagreement where RISK explicitly opposes the trade.
+- RISK can appear multiple times, including interruptions.
+- No agreement without adding new data or reasoning.
+- Tone: sharp, direct, slightly confrontational. No filler. No pleasantries.
+- Each statement must either: attack a weakness OR strengthen position with new data.
+
+FLOW PATTERN (adapt dynamically, do not copy literally):
+ANALYST opens with structure + key level
+RISK immediately challenges the level or setup logic
+ANALYST defends with specific data or concedes
+NEWS adds catalyst or says no catalyst
+RISK challenges NEWS or raises new concern
+ANALYST or NEWS rebuts
+RISK interrupts if setup still weak
+Continue until 10–14 exchanges total, then EXEC judges.
+
+OUTPUT FORMAT — use EXACTLY these labels, no deviations:
 
 EXCHANGES:
-[ANALYST]: <1-2 line statement using actual price/volume/funding data>
-[RISK]: <direct challenge to analyst>
-[ANALYST]: <defend or partially concede>
-[NEWS]: <adds macro/sentiment context>
-[RISK]: <challenges news or interrupts with new concern>
-[NEWS]: <rebuttal or clarification>
-... (continue until 6–10 total exchanges, then stop)
+[ANALYST]: <1-2 lines — structure + specific level from live data>
+[RISK]: <direct challenge — attack a specific weakness>
+[ANALYST]: <defend with data OR concede>
+[NEWS]: <specific catalyst OR "No actionable news catalyst.">
+[RISK]: <challenge NEWS or raise new concern>
+... continue to 10-14 total exchanges ...
 
 EXECUTION AGENT JUDGMENT:
-<2-3 lines. Act as judge. State who was right, what conflict existed, why one side outweighed the other. Cold, decisive. (Execution Skill)>
+<3 lines max. State strongest FOR argument. State strongest AGAINST argument. Explain why one outweighed the other. Cold and decisive. If unresolved → say "Conflict unresolved. NO TRADE." (Execution Skill)>
 
 ASSET: ${active}
 ACTION: Buy / Sell / No Trade
 CONFIDENCE: [0-100%]
 RISK LEVEL: Low / Medium / High
-ENTRY: $[price]
-ENTRY REASON: [1 short line]
-TAKE PROFIT: $[price]
-TP REASON: [1 short line]
-STOP LOSS: $[price]
-SL REASON: [1 short line]
-POSITION SIZE: [X% of capital]
-SIZE REASON: [1 short line reflecting Risk Manager concerns]
-TRADE VALIDITY: [condition or time constraint e.g. "Valid only if price holds above $X in next 2 hours"]
-REASON: [1-2 line final summary]
+ENTRY: $[price or N/A]
+ENTRY REASON: [1 line tied to confirmed structure, not assumption]
+TAKE PROFIT: $[price or N/A]
+TP REASON: [1 line — next liquidity zone or structure target]
+STOP LOSS: $[price or N/A]
+SL REASON: [1 line — clear invalidation level from debate]
+POSITION SIZE: [X% of capital — 1-3% if High risk, 3-5% if Medium, up to 8% if Low]
+SIZE REASON: [1 line — must reference Risk Manager's specific concern]
+TRADE VALIDITY: [specific condition + time window e.g. "Valid only if price holds above $X for 1 hour"]
+REASON: [1-2 lines — sharp summary referencing the core debate conflict]
 
-LOGIC RULES (mandatory):
-- Entry, TP, SL must be mathematically consistent with current price ($${fmt(d?.price,dec)}).
-- If ACTION is No Trade: set ENTRY, TP, SL to N/A and explain why in REASON.
-- If RISK LEVEL is High: POSITION SIZE must be 1-3% max. If Medium: 3-5%. If Low: up to 8%.
-- Do not force a trade if setup is genuinely weak.
+MANDATORY LOGIC CHECK (apply before writing ACTION):
+- Entry, TP, SL must be mathematically consistent with current price $${fmt(d?.price,dec)}.
+- NO TRADE if forced. NO TRADE if structure absent. NO TRADE if Risk Manager vetoed.
+- If NO TRADE: Entry = N/A, TP = N/A, SL = N/A. Explain in REASON.
+- High risk + unclear setup = max 2% position or NO TRADE.
 
-End your output with exactly: Generated by Multi-Agent Consensus Engine`;
+End output with exactly: Generated by Multi-Agent Consensus Engine`;
 
   try{
     log('Connecting to Groq agent engine...');
@@ -550,13 +591,15 @@ End your output with exactly: Generated by Multi-Agent Consensus Engine`;
       for(const line of lines){
         const agent=line.toLowerCase().startsWith('[risk]')?'risk':line.toLowerCase().startsWith('[news]')?'news':'analyst';
         const text=line.replace(/^\[?(ANALYST|NEWS|RISK)\]?[:.]?\s*/i,'').trim();
-        if(text)await speak(agent,text,getStyle(agent,text),800);
+        if(text)await speak(agent,text,getStyle(agent,text),600);
       }
     }else{
-      addDivider('Live Debate — '+exchanges.length+' Exchanges');
+      addDivider('Live Debate — '+exchanges.length+' exchanges');
       for(const ex of exchanges){
         log(AGENTS[ex.agent].name+' speaking...');
-        await speak(ex.agent,ex.text,getStyle(ex.agent,ex.text),850);
+        // Risk interrupts feel faster; analyst/news get slightly more think time
+        const thinkMs = ex.agent==='risk' ? 550 : 700;
+        await speak(ex.agent,ex.text,getStyle(ex.agent,ex.text),thinkMs);
       }
     }
 
