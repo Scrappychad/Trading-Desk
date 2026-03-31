@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FSL Trading Desk — Multi-Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#07090d;
+  --surface:#0d1117;
+  --surface2:#111820;
+  --border:#1c2a38;
+  --border2:#243648;
+  --accent:#00e5a0;
+  --accent-dim:#00e5a020;
+  --accent2:#3d9bff;
+  --accent2-dim:#3d9bff15;
+  --danger:#ff4e6a;
+  --warn:#f5c542;
+  --text:#e2eaf4;
+  --muted:#4a6880;
+  --muted2:#2a4058;
+  --mono:'DM Mono',monospace;
+  --sans:'Syne',sans-serif;
+}
+
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.5;min-height:100vh}
+
+.app{max-width:900px;margin:0 auto;padding:28px 20px}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.logo{font-family:var(--sans);font-size:16px;font-weight:800;letter-spacing:1px;color:var(--accent)}
+.logo span{color:var(--muted);font-weight:400;font-size:12px;margin-left:10px;letter-spacing:2px}
+.status-pill{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:11px;color:var(--muted);letter-spacing:1px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Skill badges */
+.api-note{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.api-badge{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:10px;color:var(--muted);letter-spacing:1px;display:flex;align-items:center;gap:5px}
+.api-badge span{color:var(--accent)}
+
+/* Coin selector */
+.coin-bar{display:flex;gap:8px;margin-bottom:20px;align-items:center}
+.coin{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 20px;font-family:var(--sans);font-weight:700;font-size:13px;letter-spacing:1.5px;color:var(--muted);cursor:pointer;transition:all 0.15s}
+.coin:hover{border-color:var(--border2);color:var(--text)}
+.coin.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.coin-price{font-family:var(--mono);font-size:10px;font-weight:300;display:block;margin-top:2px;opacity:0.65}
+
+.run{margin-left:auto;background:var(--accent);border:none;border-radius:8px;padding:10px 24px;font-family:var(--sans);font-weight:700;font-size:12px;letter-spacing:2px;color:#07090d;cursor:pointer;transition:all 0.15s;text-transform:uppercase;white-space:nowrap}
+.run:hover{opacity:0.88;transform:translateY(-1px)}
+.run:disabled{opacity:0.35;cursor:not-allowed;transform:none}
+
+/* Market strip */
+.market-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px}
+.metric-label{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.metric-val{font-family:var(--sans);font-size:18px;font-weight:700;color:var(--text)}
+.metric-val.up{color:var(--accent)}
+.metric-val.down{color:var(--danger)}
+
+/* Agents */
+.agents{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.agent{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px;transition:border-color 0.3s,background 0.3s;min-height:135px}
+.agent.speaking{border-color:var(--warn)}
+.agent.done-analyst{border-color:#00e5a045;background:var(--surface2)}
+.agent.done-news{border-color:#3d9bff45;background:var(--surface2)}
+.agent.done-risk{border-color:#ff4e6a45;background:var(--surface2)}
+.agent.done-exec{border-color:#f5c54245;background:var(--surface2)}
+
+.agent-top{display:flex;align-items:center;gap:9px;margin-bottom:11px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.agent-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.icon-analyst{background:#00e5a015;color:var(--accent)}
+.icon-news{background:#3d9bff15;color:var(--accent2)}
+.icon-risk{background:#ff4e6a15;color:var(--danger)}
+.icon-exec{background:#f5c54215;color:var(--warn)}
+
+.agent-meta{flex:1;min-width:0}
+.agent-name{font-family:var(--sans);font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.name-analyst{color:var(--accent)}
+.name-news{color:var(--accent2)}
+.name-risk{color:var(--danger)}
+.name-exec{color:var(--warn)}
+.agent-skill{font-size:9px;color:var(--muted);letter-spacing:0.8px;margin-top:2px}
+.agent-seq{font-size:11px;color:var(--muted2);font-family:var(--sans);font-weight:600}
+
+.agent-body{font-size:11px;color:var(--muted);line-height:1.75;min-height:58px}
+.agent-body.ready{color:var(--text)}
+
+.typing{display:inline-flex;gap:4px;align-items:center;padding-top:4px}
+.typing i{width:4px;height:4px;border-radius:50%;background:var(--warn);display:inline-block;animation:td 1s infinite}
+.typing i:nth-child(2){animation-delay:0.2s}
+.typing i:nth-child(3){animation-delay:0.4s}
+@keyframes td{0%,100%{opacity:0.2;transform:scale(0.8)}50%{opacity:1;transform:scale(1)}}
+
+/* Verdict */
+.verdict{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:8px;transition:border-color 0.4s,background 0.3s}
+.verdict.live{border-color:var(--accent);background:var(--surface2)}
+.verdict-top{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.verdict-title{font-family:var(--sans);font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+
+.verdict-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.vmetric{background:var(--bg);border-radius:8px;padding:11px;text-align:center;border:1px solid var(--border)}
+.vmetric-label{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.vmetric-val{font-family:var(--sans);font-weight:800;font-size:22px;color:var(--muted2)}
+.vmetric-val.buy{color:var(--accent)}
+.vmetric-val.sell{color:var(--danger)}
+.vmetric-val.wait{color:var(--warn)}
+.vmetric-val.low{color:var(--accent)}
+.vmetric-val.medium{color:var(--warn)}
+.vmetric-val.high{color:var(--danger)}
+.vmetric-val.neutral{color:var(--text)}
+
+.verdict-reason{font-size:11.5px;color:var(--muted);line-height:1.75;padding-top:12px;border-top:1px solid var(--border)}
+.verdict-reason.live{color:var(--text)}
+
+/* Log */
+.logbar{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 16px;display:flex;gap:10px;align-items:center;font-size:10px;color:var(--muted);letter-spacing:0.5px}
+.log-tag{color:var(--accent);letter-spacing:2px;font-weight:500;flex-shrink:0}
+
+.footer{text-align:center;font-size:9px;color:var(--muted2);margin-top:12px;letter-spacing:1px}
+
+@media(max-width:600px){
+  .agents{grid-template-columns:1fr}
+  .market-strip{grid-template-columns:1fr 1fr}
+  .verdict-grid{grid-template-columns:1fr 1fr}
+  .coin-bar{flex-wrap:wrap}
+  .run{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="logo">FSL Trading Desk <span>MULTI-AGENT v2</span></div>
+    <div class="status-pill"><div class="dot"></div><span id="statusText">READY</span></div>
+  </div>
+
+  <div class="api-note">
+    <div class="api-badge"><span>●</span> Bitget Market Data Skill</div>
+    <div class="api-badge"><span>●</span> Bitget Sentiment Skill</div>
+    <div class="api-badge"><span>●</span> Bitget Technical Signal Skill</div>
+    <div class="api-badge"><span>●</span> Claude Agent Engine</div>
+  </div>
+
+  <div class="coin-bar">
+    <div class="coin active" data-coin="BTC" data-sym="BTCUSDT" onclick="selectCoin(this)">BTC<span class="coin-price" id="p-BTC">—</span></div>
+    <div class="coin" data-coin="ETH" data-sym="ETHUSDT" onclick="selectCoin(this)">ETH<span class="coin-price" id="p-ETH">—</span></div>
+    <div class="coin" data-coin="SOL" data-sym="SOLUSDT" onclick="selectCoin(this)">SOL<span class="coin-price" id="p-SOL">—</span></div>
+    <button class="run" id="runBtn" onclick="runDesk()">CONVENE DESK</button>
+  </div>
+
+  <div class="market-strip">
+    <div class="metric"><div class="metric-label">Price</div><div class="metric-val" id="m-price">—</div></div>
+    <div class="metric"><div class="metric-label">24h Change</div><div class="metric-val" id="m-change">—</div></div>
+    <div class="metric"><div class="metric-label">24h Volume</div><div class="metric-val" id="m-vol">—</div></div>
+    <div class="metric"><div class="metric-label">Funding Rate</div><div class="metric-val" id="m-fund">—</div></div>
+  </div>
+
+  <div class="agents">
+    <div class="agent" id="c-analyst">
+      <div class="agent-top">
+        <div class="agent-icon icon-analyst">▲</div>
+        <div class="agent-meta">
+          <div class="agent-name name-analyst">Market Analyst</div>
+          <div class="agent-skill">MARKET DATA SKILL · TECHNICAL SIGNAL SKILL</div>
+        </div>
+        <div class="agent-seq">01</div>
+      </div>
+      <div class="agent-body" id="b-analyst">Standing by...</div>
+    </div>
+    <div class="agent" id="c-news">
+      <div class="agent-top">
+        <div class="agent-icon icon-news">◈</div>
+        <div class="agent-meta">
+          <div class="agent-name name-news">News Agent</div>
+          <div class="agent-skill">SENTIMENT SKILL · NEWS TRACKING SKILL</div>
+        </div>
+        <div class="agent-seq">02</div>
+      </div>
+      <div class="agent-body" id="b-news">Standing by...</div>
+    </div>
+    <div class="agent" id="c-risk">
+      <div class="agent-top">
+        <div class="agent-icon icon-risk">⬡</div>
+        <div class="agent-meta">
+          <div class="agent-name name-risk">Risk Manager</div>
+          <div class="agent-skill">RISK ASSESSMENT SKILL · MACRO SKILL</div>
+        </div>
+        <div class="agent-seq">03</div>
+      </div>
+      <div class="agent-body" id="b-risk">Standing by...</div>
+    </div>
+    <div class="agent" id="c-exec">
+      <div class="agent-top">
+        <div class="agent-icon icon-exec">◆</div>
+        <div class="agent-meta">
+          <div class="agent-name name-exec">Execution Agent</div>
+          <div class="agent-skill">EXECUTION SKILL · AGGREGATED INTELLIGENCE</div>
+        </div>
+        <div class="agent-seq">04</div>
+      </div>
+      <div class="agent-body" id="b-exec">Awaiting synthesis...</div>
+    </div>
+  </div>
+
+  <div class="verdict" id="verdict">
+    <div class="verdict-top">
+      <div class="verdict-title">Execution Output</div>
+    </div>
+    <div class="verdict-grid">
+      <div class="vmetric"><div class="vmetric-label">Decision</div><div class="vmetric-val" id="v-decision">—</div></div>
+      <div class="vmetric"><div class="vmetric-label">Confidence</div><div class="vmetric-val neutral" id="v-conf">—</div></div>
+      <div class="vmetric"><div class="vmetric-label">Risk</div><div class="vmetric-val" id="v-risk">—</div></div>
+      <div class="vmetric"><div class="vmetric-label">Position Size</div><div class="vmetric-val neutral" id="v-pos">—</div></div>
+    </div>
+    <div class="verdict-reason" id="v-reason">Agent debate pending. Convene the desk to generate a live verdict.</div>
+  </div>
+
+  <div class="logbar">
+    <span class="log-tag">SYS</span>
+    <span id="logMsg">Select a coin and convene the desk to begin multi-agent analysis.</span>
+  </div>
+
+  <div class="footer">NOT FINANCIAL ADVICE &nbsp;·&nbsp; FSL TRADING DESK v2.0 &nbsp;·&nbsp; POWERED BY BITGET AGENTHUB SKILLS + CLAUDE</div>
+</div>
+
+<script>
+const coins = { BTC:{sym:'BTCUSDT'}, ETH:{sym:'ETHUSDT'}, SOL:{sym:'SOLUSDT'} };
+let active = 'BTC';
+let busy = false;
+const mktData = {};
+
+function log(msg){ document.getElementById('logMsg').textContent = msg; }
+function setStatus(t){ document.getElementById('statusText').textContent = t; }
+function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+function fmt(n, dec=2){
+  if(n == null) return '—';
+  return n.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+function fmtVol(v){
+  if(!v) return '—';
+  if(v > 1e9) return (v/1e9).toFixed(2) + 'B';
+  if(v > 1e6) return (v/1e6).toFixed(2) + 'M';
+  return v.toFixed(0);
+}
+
+async function fetchMarket(coin){
+  const sym = coins[coin].sym;
+  try {
+    const [spotRes, fundRes] = await Promise.all([
+      fetch(`https://api.bitget.com/api/v2/spot/market/tickers?symbol=${sym}`),
+      fetch(`https://api.bitget.com/api/v2/mix/market/current-fund-rate?symbol=${sym}&productType=USDT-FUTURES`)
+    ]);
+    const spotData = await spotRes.json();
+    const fundData = await fundRes.json();
+    const t = spotData?.data?.[0];
+    if(!t) return null;
+    return {
+      price: parseFloat(t.lastPr),
+      change: parseFloat(t.change24h) * 100,
+      vol: parseFloat(t.usdtVol),
+      high: parseFloat(t.high24h),
+      low: parseFloat(t.low24h),
+      fund: parseFloat(fundData?.data?.fundingRate) * 100 || null
+    };
+  } catch(e){ return null; }
+}
+
+async function loadMarket(coin){
+  const d = await fetchMarket(coin);
+  if(!d) return;
+  mktData[coin] = d;
+  const dec = d.price > 100 ? 0 : 4;
+  const el = document.getElementById('p-' + coin);
+  if(el) el.textContent = '$' + fmt(d.price, dec);
+  if(coin === active) renderStrip(d);
+}
+
+function renderStrip(d){
+  const dec = d.price > 100 ? 0 : 4;
+  document.getElementById('m-price').textContent = '$' + fmt(d.price, dec);
+  const cel = document.getElementById('m-change');
+  cel.textContent = (d.change >= 0 ? '+' : '') + fmt(d.change) + '%';
+  cel.className = 'metric-val ' + (d.change >= 0 ? 'up' : 'down');
+  document.getElementById('m-vol').textContent = fmtVol(d.vol);
+  const fe = document.getElementById('m-fund');
+  if(d.fund != null){
+    fe.textContent = (d.fund >= 0 ? '+' : '') + fmt(d.fund, 4) + '%';
+    fe.className = 'metric-val ' + (d.fund > 0 ? 'down' : 'up');
+  } else {
+    fe.textContent = '—';
+    fe.className = 'metric-val';
+  }
+}
+
+function resetAgents(){
+  ['analyst','news','risk','exec'].forEach(a => {
+    const b = document.getElementById('b-' + a);
+    b.innerHTML = a === 'exec' ? 'Awaiting synthesis...' : 'Standing by...';
+    b.classList.remove('ready');
+    document.getElementById('c-' + a).className = 'agent';
+  });
+  ['decision','conf','risk','pos'].forEach(k => {
+    const e = document.getElementById('v-' + k);
+    e.textContent = '—';
+    e.className = 'vmetric-val' + (k === 'conf' || k === 'pos' ? ' neutral' : '');
+  });
+  const vr = document.getElementById('v-reason');
+  vr.textContent = 'Agent debate pending. Convene the desk to generate a live verdict.';
+  vr.classList.remove('live');
+  document.getElementById('verdict').classList.remove('live');
+}
+
+function showTyping(id){
+  const b = document.getElementById('b-' + id);
+  b.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+  b.classList.remove('ready');
+  document.getElementById('c-' + id).className = 'agent speaking';
+}
+
+function setBody(id, text){
+  const b = document.getElementById('b-' + id);
+  b.classList.add('ready');
+  document.getElementById('c-' + id).className = 'agent done-' + id;
+  let i = 0; b.textContent = '';
+  const iv = setInterval(() => {
+    b.textContent = text.slice(0, i); i += 4;
+    if(i > text.length){ b.textContent = text; clearInterval(iv); }
+  }, 16);
+}
+
+function extract(raw, from, to){
+  const rx = new RegExp(from + ':?\\s*([\\s\\S]*?)(?=' + to + ':?|$)', 'i');
+  const m = raw.match(rx);
+  return m ? m[1].trim() : '';
+}
+
+function getField(raw, key){
+  const rx = new RegExp(key + '[:\\s]+([^\\n]+)', 'i');
+  const m = raw.match(rx);
+  return m ? m[1].trim() : '—';
+}
+
+async function selectCoin(el){
+  document.querySelectorAll('.coin').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  active = el.dataset.coin;
+  resetAgents();
+  const d = mktData[active];
+  if(d) renderStrip(d);
+  await loadMarket(active);
+}
+
+async function runDesk(){
+  if(busy) return;
+  busy = true;
+  document.getElementById('runBtn').disabled = true;
+  resetAgents();
+  setStatus('ACTIVE');
+
+  log('Fetching live Bitget market data for ' + active + '...');
+  await loadMarket(active);
+
+  const d = mktData[active];
+  const dec = d?.price > 100 ? 2 : 4;
+  const dataCtx = d
+    ? `Live Bitget Market Data for ${active} (via Bitget AgentHub Market Data Skill):
+- Price: $${fmt(d.price, dec)}
+- 24h Change: ${(d.change >= 0 ? '+' : '') + fmt(d.change)}%
+- 24h High: $${fmt(d.high, dec)} | 24h Low: $${fmt(d.low, dec)}
+- 24h Volume (USDT): ${fmtVol(d.vol)}
+- Futures Funding Rate: ${d.fund != null ? (d.fund >= 0 ? '+' : '') + fmt(d.fund, 4) + '%' : 'unavailable'}`
+    : `No live Bitget data available — agents must rely on contextual knowledge and flag uncertainty.`;
+
+  const prompt = `You are the FSL Multi-Agent Trading Desk — a simulated hedge fund decision room analyzing ${active}.
+
+${dataCtx}
+
+AGENTS — respond in EXACT order:
+
+1. MARKET ANALYST [Market Data Skill + Technical Signal Skill]
+Aggressive, opportunity-focused. Reference the live data above. Find a specific technical signal for entry, or deny one with evidence. Max 3 lines. No fluff.
+
+2. NEWS AGENT [Sentiment Skill + News Tracking Skill]
+Fast, reactive. Comment on current macro/narrative conditions for ${active}. Flag catalysts or risks not covered by the Analyst. Max 3 lines.
+
+3. RISK MANAGER [Risk Assessment Skill + Macro Skill]
+Strict, skeptical. PRIMARY ROLE: challenge this trade. Directly counter BOTH Analyst and News Agent with at least one hard reason NOT to enter. Mandatory disagreement. Max 3 lines.
+
+4. EXECUTION AGENT [Execution Skill]
+Cold, decisive. Synthesize all three inputs. No new analysis. State the final call only. Max 3 lines.
+
+OUTPUT FORMAT — use these EXACT headers:
+MARKET ANALYST:
+[3 lines]
+
+NEWS AGENT:
+[3 lines]
+
+RISK MANAGER:
+[3 lines]
+
+EXECUTION AGENT:
+[3 lines]
+
+FINAL DECISION: Buy / Sell / No Trade
+CONFIDENCE: [0-100%]
+RISK LEVEL: Low / Medium / High
+POSITION SIZE: [% of capital, e.g. 3%]
+REASON: [1-2 lines max]
+
+Tone: elite professionals, sharp, slightly confrontational. Sound like a real desk operating under pressure.`;
+
+  try {
+    log('Connecting to Claude Agent Engine via secure proxy...');
+
+    // On Vercel this hits /api/analyze (your serverless function)
+    // For local dev: change to http://localhost:3000/api/analyze
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+
+    if(!res.ok){
+      const errText = await res.text();
+      throw new Error('Proxy error: ' + res.status + ' — ' + errText);
+    }
+
+    const data = await res.json();
+    const raw = data.content?.map(c => c.text || '').join('') || '';
+
+    const aText = extract(raw, 'MARKET ANALYST', 'NEWS AGENT');
+    const nText = extract(raw, 'NEWS AGENT', 'RISK MANAGER');
+    const rText = extract(raw, 'RISK MANAGER', 'EXECUTION AGENT');
+    const eText = extract(raw, 'EXECUTION AGENT', 'FINAL DECISION');
+
+    log('Market Analyst transmitting...');
+    showTyping('analyst');
+    await wait(1100);
+    setBody('analyst', aText || 'Technical analysis complete.');
+
+    log('News Agent scanning sentiment feeds...');
+    showTyping('news');
+    await wait(1300);
+    setBody('news', nText || 'Sentiment scan complete.');
+
+    log('Risk Manager stress-testing position...');
+    showTyping('risk');
+    await wait(1400);
+    setBody('risk', rText || 'Risk assessment complete.');
+
+    log('Execution Agent synthesizing final verdict...');
+    showTyping('exec');
+    await wait(1200);
+    setBody('exec', eText || 'Synthesis complete.');
+
+    await wait(300);
+
+    const dec = getField(raw, 'FINAL DECISION').toUpperCase();
+    const conf = getField(raw, 'CONFIDENCE');
+    const risk = getField(raw, 'RISK LEVEL').toLowerCase().trim();
+    const pos = getField(raw, 'POSITION SIZE');
+    const reason = getField(raw, 'REASON');
+
+    const dEl = document.getElementById('v-decision');
+    dEl.textContent = dec.includes('BUY') ? 'BUY' : dec.includes('SELL') ? 'SELL' : 'WAIT';
+    dEl.className = 'vmetric-val ' + (dec.includes('BUY') ? 'buy' : dec.includes('SELL') ? 'sell' : 'wait');
+
+    document.getElementById('v-conf').textContent = conf;
+
+    const rEl = document.getElementById('v-risk');
+    rEl.textContent = risk.charAt(0).toUpperCase() + risk.slice(1);
+    rEl.className = 'vmetric-val ' + (['low','medium','high'].includes(risk) ? risk : 'neutral');
+
+    document.getElementById('v-pos').textContent = pos;
+
+    const vrEl = document.getElementById('v-reason');
+    vrEl.textContent = reason;
+    vrEl.classList.add('live');
+    document.getElementById('verdict').classList.add('live');
+
+    const verdict = dec.includes('BUY') ? 'BUY' : dec.includes('SELL') ? 'SELL' : 'NO TRADE';
+    log('Analysis complete — ' + active + ' verdict: ' + verdict + ' · ' + conf + ' confidence.');
+    setStatus('COMPLETE');
+
+  } catch(e) {
+    log('ERROR: ' + e.message);
+    setStatus('ERROR');
+    console.error(e);
+  }
+
+  busy = false;
+  document.getElementById('runBtn').disabled = false;
+}
+
+// Load all prices on boot
+(async () => {
+  setStatus('LOADING');
+  log('Loading live Bitget prices...');
+  await Promise.all(Object.keys(coins).map(c => loadMarket(c)));
+  setStatus('READY');
+  log('Live data ready. Select a coin and convene the desk.');
+})();
+</script>
+</body>
+</html>
