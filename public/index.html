@@ -654,6 +654,7 @@ function renderFilter(fr){
   vEl.style.color=allPass?'var(--accent)':'var(--red)';
 }
 
+async function runDesk(){
   if(busy)return;busy=true;
   document.getElementById('runBtn').disabled=true;setStatus('ACTIVE');
   ['v-action','v-risk','v-entry','v-tp','v-sl'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
