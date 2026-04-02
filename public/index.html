@@ -410,14 +410,19 @@ body::after{content:'';position:fixed;inset:0;opacity:.025;background-image:url(
         </div>
         <div class="plan-metrics">
           <div class="pm">
+            <div class="pm-label">Direction</div>
+            <div class="pm-val" style="font-size:18px" id="v-direction">—</div>
+            <div class="pm-sub" id="v-direction-sub">awaiting analysis</div>
+          </div>
+          <div class="pm">
             <div class="pm-label">Action</div>
             <div class="pm-val" id="v-action">—</div>
             <div class="pm-sub" id="v-conf-sub">Confidence —</div>
           </div>
           <div class="pm">
-            <div class="pm-label">Risk</div>
+            <div class="pm-label">Risk · R:R</div>
             <div class="pm-val" id="v-risk">—</div>
-            <div class="pm-sub" id="v-pos">Size —</div>
+            <div class="pm-sub" id="v-rr">R:R —</div>
           </div>
           <div class="pm">
             <div class="pm-label">Entry</div>
@@ -429,14 +434,10 @@ body::after{content:'';position:fixed;inset:0;opacity:.025;background-image:url(
             <div class="pm-val sm tp-v" id="v-tp">—</div>
             <div class="pm-sub" id="v-tp-why">—</div>
           </div>
-          <div class="pm">
+          <div class="pm" style="border-right:none">
             <div class="pm-label">Stop Loss</div>
             <div class="pm-val sm sl-v" id="v-sl">—</div>
             <div class="pm-sub" id="v-sl-why">—</div>
-          </div>
-          <div class="pm" style="border-right:none">
-            <div class="pm-label">Bitget AgentHub</div>
-            <div class="pm-val" style="font-size:9px;color:var(--text2);line-height:1.5;margin-top:2px">Multi-Agent<br>Consensus Engine</div>
           </div>
         </div>
         <div class="plan-validity">
@@ -657,8 +658,8 @@ function renderFilter(fr){
 async function runDesk(){
   if(busy)return;busy=true;
   document.getElementById('runBtn').disabled=true;setStatus('ACTIVE');
-  ['v-action','v-risk','v-entry','v-tp','v-sl'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
-  ['v-conf-sub','v-pos','v-entry-why','v-tp-why','v-sl-why','v-validity'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
+  ['v-action','v-risk','v-entry','v-tp','v-sl','v-direction'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='—';e.className=e.className;e.style.color='';}});
+  ['v-conf-sub','v-pos','v-rr','v-entry-why','v-tp-why','v-sl-why','v-validity','v-direction-sub'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
   document.getElementById('v-reason').textContent='Agent debate pending.';
   document.getElementById('v-reason').className='pr-val';
   document.getElementById('vGen').textContent='';
@@ -690,133 +691,168 @@ Futures Funding Rate: ${fr}${d.markPrice?` | Mark: $${fmt(d.markPrice,p)}`:''}${
 Range position: ${d.high>d.low?(((d.price-d.low)/(d.high-d.low))*100).toFixed(0):'—'}% of today's range`
     :`No live Bitget data available — agents must flag uncertainty explicitly.`;
 
+  // Chart context — observational only, no fabricated indicators
+  const rangePos=d?.high>d?.low?(((d.price-d.low)/(d.high-d.low))*100).toFixed(0):null;
+  const rangeCtx=rangePos
+    ?`Range context: Price is at ${rangePos}% of today's range.${
+        rangePos>=80?' Near session high — watch for rejection or breakout test.':
+        rangePos<=20?' Near session low — watch for support hold or breakdown.':
+        ' At midpoint — no structural edge from range position alone.'}`
+    :'Range context: Insufficient data.';
+
   const prompt=`You are the FSL Multi-Agent Trading Desk. Agents debate whether to trade ${active} right now.
 This is a real trading desk — sharp, data-driven, confrontational. Not a chatbot.
 
 ${dataCtx}
+${rangeCtx}
 
 AGENT MANDATES:
 
 ANALYST (Market Data Skill):
-- Open with market structure: trend / range / breakout / deviation — be specific.
-- Cite actual price levels from data. Name a liquidity zone or key level.
-- Entry must be based on confirmation, not hope.
-- If structure is genuinely absent, say: "No clear structure. No trade." Then accept that.
+- Open by naming market structure: trend / range / breakout / deviation — cite specific price levels.
+- Use chart context: reference current price vs 24h high ($${fmt(d?.high,p)}) and low ($${fmt(d?.low,p)}), and range position (${rangePos??'unknown'}% of day's range).
+- Do NOT fabricate indicators (no RSI, MACD, EMA). Stick to observable price action only.
+- Entry must be based on confirmed structure, not assumption.
+- If structure is absent: say "No clear structure. No trade." and hold that position.
 
 NEWS (Sentiment Analysis Skill):
-- Cite a specific catalyst if one exists — major announcement, protocol update, macro event.
-- If none exists, say: "No actionable catalyst." and focus on positioning/sentiment data.
-- Always respond directly to what was just said. No solo speeches.
+- Cite only specific catalysts: named announcements, protocol events, macro dates.
+- If none: say "No actionable catalyst." then comment on positioning or funding sentiment.
+- Respond directly to what was just said. No isolated speeches.
 
 RISK (Risk Assessment Skill):
-- Challenge at least once each: Analyst AND News.
-- Name a specific invalidation level: "Trade invalid if price breaks $X."
-- Assess R:R ratio using actual entry, TP, SL numbers. If R:R < 1.5 → say so and push back.
-- You have soft veto power — but a strong opposing argument from Analyst can override you.
-- Position size must reflect your concern level.
+- Challenge Analyst AND News at least once each.
+- Always name a specific invalidation level: "Trade invalid if price breaks $X."
+- Calculate R:R using these STRICT rules:
+  * Risk = |Entry − Stop Loss| (absolute value)
+  * Reward = |Take Profit − Entry| (absolute value)
+  * R:R = Reward ÷ Risk, rounded to 1 decimal
+  * If Risk = 0 → invalidate trade immediately
+  * R:R < 1.0 → INVALID, force NO TRADE
+  * R:R 1.0–1.4 → WEAK, push back hard
+  * R:R 1.5–1.9 → ACCEPTABLE
+  * R:R ≥ 2.0 → STRONG
+- Soft veto power — overridable only by hard data from Analyst.
 
 EXEC (Execution Skill):
-- You are the judge, not a debater. You speak last and cannot be overruled.
-- Before issuing any verdict, run ALL 5 filter checks below IN ORDER.
-- You MUST output the FILTER RESULT block showing each check's outcome.
-- You can only approve a trade if ALL 5 checks pass. No exceptions.
-- State the strongest FOR argument and strongest AGAINST argument, then rule.
+- Judge only. Not a debater.
+- Run ALL 5 filter checks IN ORDER before any verdict.
+- Output the FILTER RESULT block exactly as specified.
+- If 2 or more filters fail → NO TRADE, no override possible.
+- If R:R filter fails → strongly discourage trade, output NO TRADE unless 4/5 other checks pass AND R:R ≥ 1.0.
+- If all 5 pass → approve trade with Risk Manager's conditions.
+- No forced trades. Discipline over activity.
 
-━━━ TRADE FILTER ENGINE (run before verdict) ━━━
+━━━ TRADE FILTER ENGINE ━━━
 
 FILTER 1 — STRUCTURE CHECK:
-Question: Is market structure clearly defined as trend, range, or breakout?
-Pass: Structure named and confirmed by Analyst with specific levels.
-Fail: Structure unclear, contested, or Analyst said "No clear structure."
+Pass: Structure clearly named (trend/range/breakout) AND confirmed with specific price levels by Analyst.
+Fail: Structure unclear, absent, or contested without resolution.
 → FAIL = NO TRADE
 
 FILTER 2 — MOMENTUM CHECK:
-Question: Is there meaningful directional momentum?
-Pass: 24h change > ±1.5% AND price moving with conviction away from open.
-Fail: Price flat, choppy, or 24h change weak relative to range.
-Data available: 24h change is ${pct>=0?'+':''}${pct}%, range position ${d?.high>d?.low?(((d?.price-d?.low)/(d?.high-d?.low))*100).toFixed(0):'—'}% of day's range.
+Pass: 24h change > ±1.5% AND price has conviction away from open ($${fmt(d?.open,p)}).
+Fail: 24h change is weak (current: ${pct>=0?'+':''}${pct}%) or price is choppy/flat.
+Range position ${rangePos??'unknown'}%: use this as supporting context, not sole evidence.
 → FAIL = NO TRADE
 
-FILTER 3 — CONFLUENCE CHECK:
-Score 1 point for each of the following that is confirmed:
-[ ] Market structure aligned with trade direction
-[ ] Momentum confirms direction (filter 2 passed)
-[ ] Volume supports move: 24h USDT vol is $${fmtV(d?.usdtVol)} — judge if elevated or weak
-[ ] Derivatives confirm: funding rate ${fr}, open interest ${d?.openInterest?fmtV(d.openInterest):'unknown'}
-[ ] News catalyst exists (not vague sentiment — specific event only)
-Minimum score to pass: 3 out of 5.
-→ Score < 3 = NO TRADE
+FILTER 3 — CONFLUENCE CHECK (need 3/5):
+[ ] Structure aligns with trade direction
+[ ] Momentum confirms (F2 passed)
+[ ] Volume elevated: $${fmtV(d?.usdtVol)} — is this above average for this asset?
+[ ] Derivatives signal: funding ${fr}, OI ${d?.openInterest?fmtV(d.openInterest):'unknown'} — net bullish/bearish?
+[ ] Specific news catalyst (not sentiment — must be a named event)
+Score < 3 → FAIL = NO TRADE
 
 FILTER 4 — RISK-REWARD CHECK:
-Calculate R:R using proposed Entry, TP, SL.
-Formula: R:R = (TP - Entry) / (Entry - SL) for BUY, reverse for SELL.
-Minimum acceptable R:R: 1.5
-Ideal R:R: 2.0+
-→ R:R < 1.5 = NO TRADE
+Formula: Risk = |Entry − SL|, Reward = |TP − Entry|, R:R = Reward ÷ Risk (round to 1dp)
+R:R < 1.0 → INVALID → NO TRADE
+R:R 1.0–1.4 → WEAK → reduce confidence 10–15%, still FAIL filter
+R:R 1.5–1.9 → ACCEPTABLE → PASS
+R:R ≥ 2.0 → STRONG → PASS, slight confidence boost
+If Entry/TP/SL = N/A → R:R = N/A → FAIL
 
 FILTER 5 — CONVICTION CHECK:
-Question: Did the debate produce a clear, uncontested direction?
-Pass: Analyst and/or News held position under Risk challenge. Disagreement was resolved.
-Fail: Agents showed conflicting signals, weak conviction, or Risk Manager's veto was not countered with hard data.
-→ Unresolved conflict = NO TRADE
+Pass: Debate reached a resolved direction. Risk Manager challenged but was countered with data.
+Fail: Agents unresolved, contradictory signals, or Risk Manager's veto stood unchallenged.
+→ Unresolved = NO TRADE
 
 ━━━ END FILTER ENGINE ━━━
 
-EXEC RULING LOGIC:
-- If ANY filter fails → ACTION must be NO TRADE, no exceptions, no overrides.
-- If all 5 pass → approve the trade with the conditions Risk Manager set.
-- Do not force a trade to satisfy the user. Discipline over activity.
+DIRECTION ASSIGNMENT RULES (MANDATORY):
+Assign exactly one direction label based on these strict conditions:
+- → NEUTRAL: market is clearly ranging OR no structure OR agents disagree unresolved
+- ↗ CONDITIONAL BUY: breakout forming but NOT confirmed, OR agents partially disagree
+- ↘ CONDITIONAL SELL: breakdown forming but NOT confirmed, OR agents partially disagree
+- ↑ STRONG BUY: breakout confirmed WITH momentum — requires BOTH. No exceptions.
+- ↓ STRONG SELL: breakdown confirmed WITH momentum — requires BOTH. No exceptions.
+If agents disagree → downgrade to CONDITIONAL. If no structure → force NEUTRAL.
+
+CONFIDENCE SCORING RULES (MANDATORY):
+Base range: 60–70% for standard setups.
+Weak setup (F2 or F3 barely passed): 50–60%
+Strong setup (all filters clear): 70–75%
+Elite setup (rare): 75–85% ONLY IF structure clear + momentum confirmed + R:R ≥ 1.8 + agents aligned with minimal conflict.
+NEVER output 90%+.
+Penalties — apply before final number:
+- Conflicting agents (unresolved): −5 to −10%
+- No news catalyst: cap at 70%
+- R:R 1.0–1.4: cap at 65%
+- R:R < 1.0: force NO TRADE
+- R:R ≥ 2.0: +2–3% boost (still capped at 85%)
 
 DEBATE: 10–14 exchanges, ANALYST/NEWS/RISK only. 1–2 lines max each. Fast, adversarial, direct.
-Each agent must respond to the previous statement — not speak in isolation.
-RISK challenges, ANALYST/NEWS defend or concede with data. At least one strong disagreement required.
+Each agent responds to the previous statement. RISK challenges both. One strong disagreement required.
 
-OUTPUT FORMAT — use EXACTLY these labels:
+OUTPUT FORMAT — use EXACTLY these labels, no deviations:
 
 EXCHANGES:
-[ANALYST]: <market structure + specific level from data above>
+[ANALYST]: <structure + specific level + chart context reference>
 [RISK]: <direct challenge>
-[ANALYST]: <defend with data or concede with reasoning>
-[NEWS]: <specific catalyst OR "No actionable catalyst." + positioning note>
-[RISK]: <challenge news>
+[ANALYST]: <defend with data or concede>
+[NEWS]: <specific catalyst OR "No actionable catalyst." + sentiment note>
+[RISK]: <challenge news or raise new concern>
 [NEWS]: <rebuttal>
-[RISK]: <final concern or accept if countered>
+[RISK]: <final concern or accept>
 [ANALYST]: <final position>
 ... (up to 14 total)
 
 EXECUTION AGENT JUDGMENT:
-<FOR: strongest argument. AGAINST: strongest argument. Then state filter results and ruling. (Execution Skill)>
+<FOR: [strongest argument]. AGAINST: [strongest argument]. Filter result summary and ruling. (Execution Skill)>
 
 FILTER RESULT:
 F1 STRUCTURE: [PASS/FAIL] — [1 line reason]
 F2 MOMENTUM: [PASS/FAIL] — [1 line reason]
-F3 CONFLUENCE: [X/5 — PASS/FAIL] — [list which factors scored]
-F4 RISK-REWARD: [calculated R:R ratio — PASS/FAIL]
+F3 CONFLUENCE: [X/5 — PASS/FAIL] — [which factors scored]
+F4 RISK-REWARD: [R:R = X.X — PASS/FAIL]
 F5 CONVICTION: [PASS/FAIL] — [1 line reason]
 FILTER VERDICT: [ALL PASS → Trade approved / FAILED on F# → NO TRADE]
 
 ASSET: ${active}
+DIRECTION: [→ NEUTRAL / ↗ CONDITIONAL BUY / ↘ CONDITIONAL SELL / ↑ STRONG BUY / ↓ STRONG SELL]
 ACTION: Buy / Sell / No Trade
-CONFIDENCE: [0-100%]
+CONFIDENCE: [X% — must follow scoring rules above]
 RISK LEVEL: Low / Medium / High
 ENTRY: $[price or N/A]
-ENTRY REASON: [1 line — what confirms the entry]
+ENTRY REASON: [1 line — confirmed structure basis]
 TAKE PROFIT: $[price or N/A]
-TP REASON: [1 line — structure or liquidity target]
+TP REASON: [1 line — next level or liquidity target]
 STOP LOSS: $[price or N/A]
-SL REASON: [1 line — why this level matters]
-POSITION SIZE: [X% — High risk: 1-3%, Medium: 3-5%, Low: 5-8%]
-SIZE REASON: [1 line]
-TRADE VALIDITY: [specific condition + time window, OR if NO TRADE: what to wait for — specific breakout level or confirmation condition]
-REASON: [1-2 line sharp summary referencing which filter passed or failed]
+SL REASON: [1 line — invalidation level from debate]
+RISK-REWARD: [R:R = X.X or N/A]
+POSITION SIZE: [X% — High: 1-3%, Medium: 3-5%, Low: 5-8%]
+SIZE REASON: [1 line reflecting Risk Manager's concern]
+TRADE VALIDITY: [specific condition + time window. If NO TRADE: exact breakout level or confirmation to wait for]
+REASON: [1-2 lines — reference which filters passed/failed and why direction was assigned]
 
 MATH RULES:
-- All prices must be consistent with current price $${fmt(d?.price,p)}.
-- For a BUY: Entry < TP, Entry > SL. For a SELL: Entry > TP, Entry < SL.
-- No trade: Entry = N/A, TP = N/A, SL = N/A.
-- If High risk → position size max 3%.
+- All prices consistent with current price $${fmt(d?.price,p)}.
+- BUY: Entry > SL, Entry < TP. SELL: Entry < SL, Entry > TP.
+- NO TRADE: Entry/TP/SL = N/A. R:R = N/A.
+- High risk → position size max 3%.
+- R:R < 1.0 → override to NO TRADE regardless of other filters.
 
-End with: Generated by Multi-Agent Consensus Engine`;
+End with exactly: Generated via multi-agent consensus across structure, momentum, sentiment, and risk models. Probabilistic, not predictive.`;
 
   try{
     log('Connecting to Groq engine...');
@@ -854,8 +890,10 @@ End with: Generated by Multi-Agent Consensus Engine`;
     if(fr)renderFilter(fr);
 
     const action=getField(raw,'ACTION').toUpperCase();
+    const direction=getField(raw,'DIRECTION');
     const conf=getField(raw,'CONFIDENCE');
     const risk=getField(raw,'RISK LEVEL').toLowerCase().trim();
+    const rr=getField(raw,'RISK-REWARD');
     const entry=getField(raw,'ENTRY');
     const entryWhy=getField(raw,'ENTRY REASON');
     const tp=getField(raw,'TAKE PROFIT');
@@ -866,15 +904,26 @@ End with: Generated by Multi-Agent Consensus Engine`;
     const validity=getField(raw,'TRADE VALIDITY');
     const reason=getField(raw,'REASON');
 
+    // Direction
+    const dEl=document.getElementById('v-direction');
+    const isNeutral=direction.includes('NEUTRAL'),isCond=direction.includes('CONDITIONAL');
+    dEl.textContent=direction!=='—'?direction:'—';
+    dEl.style.color=isNeutral?'var(--text2)':isCond?'var(--amber)':direction.includes('↑')||direction.includes('↗')?'var(--accent)':'var(--red)';
+    document.getElementById('v-direction-sub').textContent=
+      isNeutral?'ranging / no edge':isCond?'unconfirmed setup':'confirmed + momentum';
+
     const isBuy=action.includes('BUY'),isSell=action.includes('SELL');
     const aEl=document.getElementById('v-action');
     aEl.textContent=isBuy?'BUY':isSell?'SELL':'NO TRADE';
     aEl.className='pm-val '+(isBuy?'buy':isSell?'sell':'notrade');
     document.getElementById('v-conf-sub').textContent='Confidence '+conf;
+
     const rEl=document.getElementById('v-risk');
     rEl.textContent=risk.charAt(0).toUpperCase()+risk.slice(1);
     rEl.className='pm-val '+({'low':'lo','medium':'med','high':'hi'}[risk]||'neutral');
+    document.getElementById('v-rr').textContent=rr!=='—'?rr:'R:R —';
     document.getElementById('v-pos').textContent='Size '+pos;
+
     document.getElementById('v-entry').textContent=entry;
     document.getElementById('v-entry-why').textContent=entryWhy;
     document.getElementById('v-tp').textContent=tp;
@@ -882,9 +931,10 @@ End with: Generated by Multi-Agent Consensus Engine`;
     document.getElementById('v-sl').textContent=sl;
     document.getElementById('v-sl-why').textContent=slWhy;
     document.getElementById('v-validity').textContent=validity;
+
     const vrEl=document.getElementById('v-reason');
     vrEl.textContent=reason;vrEl.className='pr-val live';
-    document.getElementById('vGen').textContent='Generated by Multi-Agent Consensus Engine';
+    document.getElementById('vGen').textContent='Generated via multi-agent consensus across structure, momentum, sentiment, and risk models. Probabilistic, not predictive.';
 
     const verdict=isBuy?'BUY':isSell?'SELL':'NO TRADE';
     log('Session complete — '+active+': '+verdict+' · '+conf+' · '+nowStr());
