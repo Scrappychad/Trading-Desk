@@ -659,7 +659,7 @@ async function runDesk(){
   if(busy)return;busy=true;
   document.getElementById('runBtn').disabled=true;setStatus('ACTIVE');
   ['v-action','v-risk','v-entry','v-tp','v-sl','v-direction'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='—';e.className=e.className;e.style.color='';}});
-  ['v-conf-sub','v-pos','v-rr','v-entry-why','v-tp-why','v-sl-why','v-validity','v-direction-sub'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
+  ['v-conf-sub','v-rr','v-entry-why','v-tp-why','v-sl-why','v-validity','v-direction-sub'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
   document.getElementById('v-reason').textContent='Agent debate pending.';
   document.getElementById('v-reason').className='pr-val';
   document.getElementById('vGen').textContent='';
@@ -922,7 +922,8 @@ End with exactly: Generated via multi-agent consensus across structure, momentum
     rEl.textContent=risk.charAt(0).toUpperCase()+risk.slice(1);
     rEl.className='pm-val '+({'low':'lo','medium':'med','high':'hi'}[risk]||'neutral');
     document.getElementById('v-rr').textContent=rr!=='—'?rr:'R:R —';
-    document.getElementById('v-pos').textContent='Size '+pos;
+    const rrEl=document.getElementById('v-rr');
+    if(rrEl)rrEl.textContent=(rr!=='—'?rr:'R:R —')+' · '+pos;
 
     document.getElementById('v-entry').textContent=entry;
     document.getElementById('v-entry-why').textContent=entryWhy;
