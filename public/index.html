@@ -186,12 +186,13 @@ body::after{content:'';position:fixed;inset:0;opacity:.025;background-image:url(
 #logMsg{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ━━━ CHARACTER CARDS ━━━ */
-.char-card{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);margin-bottom:4px;animation:charIn .25s cubic-bezier(.34,1.56,.64,1) both}
+.char-card{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);margin-bottom:4px;animation:charIn .25s cubic-bezier(.34,1.56,.64,1) both;position:relative}
 @keyframes charIn{from{opacity:0;transform:translateX(-10px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+.char-face-wrap{width:44px;height:44px;flex-shrink:0;position:relative}
 
-.char-face{font-size:26px;line-height:1;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:8px;flex-shrink:0;position:relative;animation:facePop .3s cubic-bezier(.34,1.56,.64,1) both}
-@keyframes facePop{from{transform:scale(.6) rotate(-8deg)}to{transform:scale(1) rotate(0deg)}}
-.char-face::after{content:'';position:absolute;inset:0;border-radius:8px;border:1px solid currentColor;opacity:.2}
+.char-face{width:44px;height:44px;border-radius:10px;flex-shrink:0;position:absolute;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
+.char-face svg{width:100%;height:100%;display:block}
+.char-face.speaking::before{content:'';position:absolute;inset:-3px;border-radius:12px;border:2px solid currentColor;opacity:.5;animation:speakRing 1.2s ease infinite;z-index:2;pointer-events:none}
 
 .char-face-a{background:rgba(0,232,176,.08);color:var(--accent)}
 .char-face-n{background:rgba(43,143,255,.08);color:var(--blue)}
@@ -385,40 +386,7 @@ body::after{content:'';position:fixed;inset:0;opacity:.025;background-image:url(
       <!-- Agent Roster -->
       <div class="card">
         <div class="card-head"><div class="card-title">Agent Roster</div><div class="card-badge">4 ACTIVE</div></div>
-        <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="font-size:18px;width:28px;text-align:center">🧠</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-family:var(--sans);font-size:10px;font-weight:700;color:var(--accent)">Marcus Cole</div>
-              <div style="font-size:8px;color:var(--text2)">Market Analyst</div>
-            </div>
-            <div style="font-size:7px;color:var(--accent);border:1px solid var(--accent);padding:1px 5px;opacity:.6;border-radius:2px">QUANT</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="font-size:18px;width:28px;text-align:center">📡</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-family:var(--sans);font-size:10px;font-weight:700;color:var(--blue)">Elena Voss</div>
-              <div style="font-size:8px;color:var(--text2)">News Agent</div>
-            </div>
-            <div style="font-size:7px;color:var(--blue);border:1px solid var(--blue);padding:1px 5px;opacity:.6;border-radius:2px">MACRO</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="font-size:18px;width:28px;text-align:center">🛡️</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-family:var(--sans);font-size:10px;font-weight:700;color:var(--red)">Ray Holt</div>
-              <div style="font-size:8px;color:var(--text2)">Risk Manager</div>
-            </div>
-            <div style="font-size:7px;color:var(--red);border:1px solid var(--red);padding:1px 5px;opacity:.6;border-radius:2px">RISK</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="font-size:18px;width:28px;text-align:center">⚖️</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-family:var(--sans);font-size:10px;font-weight:700;color:var(--amber)">Aria Chen</div>
-              <div style="font-size:8px;color:var(--text2)">Execution Agent</div>
-            </div>
-            <div style="font-size:7px;color:var(--amber);border:1px solid var(--amber);padding:1px 5px;opacity:.6;border-radius:2px">JUDGE</div>
-          </div>
-        </div>
+        <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px" id="rosterList"></div>
       </div>
 
       <!-- Refresh -->
@@ -635,7 +603,36 @@ const AGENTS={
     title:'Senior Quant · Ex-Goldman Sachs',
     bio:'Aggressive alpha. Sees liquidity grabs before they happen.',
     tags:['STRUCTURE','TECHNICALS','MOMENTUM'],
-    face:'🧠',
+    face:`<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Head -->
+      <ellipse cx="20" cy="17" rx="9" ry="10" fill="#8B6F47"/>
+      <!-- Neck -->
+      <rect x="16" y="25" width="8" height="5" rx="2" fill="#8B6F47"/>
+      <!-- Suit collar -->
+      <path d="M8 40 L15 27 L20 31 L25 27 L32 40Z" fill="#1a2a3a"/>
+      <!-- Shirt/tie -->
+      <path d="M19 31 L20 36 L21 31" fill="#00e8b0" stroke="#00e8b0" stroke-width=".5"/>
+      <!-- Hair — short, dark, side-parted -->
+      <path d="M11 15 Q11 7 20 7 Q29 7 29 15 Q27 9 20 9 Q13 9 11 15Z" fill="#1a0a00"/>
+      <path d="M11 13 Q12 8 20 8" stroke="#1a0a00" stroke-width="2" stroke-linecap="round"/>
+      <!-- Eyes -->
+      <ellipse cx="16.5" cy="16" rx="2" ry="2.2" fill="white"/>
+      <ellipse cx="23.5" cy="16" rx="2" ry="2.2" fill="white"/>
+      <circle cx="16.8" cy="16.2" r="1.3" fill="#1a0a00"/>
+      <circle cx="23.8" cy="16.2" r="1.3" fill="#1a0a00"/>
+      <circle cx="17.3" cy="15.7" r=".4" fill="white"/>
+      <circle cx="24.3" cy="15.7" r=".4" fill="white"/>
+      <!-- Brows — stern -->
+      <path d="M14.5 13.2 Q16.5 12.2 18.5 13" stroke="#1a0a00" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M21.5 13 Q23.5 12.2 25.5 13.2" stroke="#1a0a00" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <!-- Nose -->
+      <path d="M19.5 18 Q20 20 20.5 18" stroke="#6B4F37" stroke-width=".8" fill="none" stroke-linecap="round"/>
+      <!-- Mouth — confident smirk -->
+      <path d="M17 22 Q20 24 23.5 22" stroke="#6B4F37" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <!-- Ear -->
+      <ellipse cx="11.5" cy="18" rx="1.5" ry="2" fill="#7A6040"/>
+      <ellipse cx="28.5" cy="18" rx="1.5" ry="2" fill="#7A6040"/>
+    </svg>`,
     av:'av-a',nc:'mn-a',
     faceClass:'char-face-a',nameClass:'char-name-a',tagClass:'char-tag-a'
   },
@@ -647,7 +644,41 @@ const AGENTS={
     title:'Macro Strategist · Ex-Bloomberg',
     bio:'Ice-cold. Reads sentiment like a polygraph. No fluff.',
     tags:['CATALYST','MACRO','SENTIMENT'],
-    face:'📡',
+    face:`<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Head -->
+      <ellipse cx="20" cy="17" rx="9" ry="10" fill="#F0C8A0"/>
+      <!-- Neck -->
+      <rect x="16.5" y="25" width="7" height="5" rx="2" fill="#F0C8A0"/>
+      <!-- Blazer -->
+      <path d="M8 40 L15 27 L20 31 L25 27 L32 40Z" fill="#0c1520"/>
+      <!-- Blouse highlight -->
+      <path d="M17 29 Q20 32 23 29" fill="#2b8fff" opacity=".4"/>
+      <!-- Hair — blonde, straight, shoulder-length -->
+      <path d="M11 14 Q11 6 20 6 Q29 6 29 14" fill="#C8A840"/>
+      <rect x="10" y="14" width="3.5" height="14" rx="1.5" fill="#C8A840"/>
+      <rect x="26.5" y="14" width="3.5" height="14" rx="1.5" fill="#C8A840"/>
+      <path d="M20 6 Q29 6 29 14 Q27 8 20 8 Q13 8 11 14 Q11 6 20 6Z" fill="#D4B050"/>
+      <!-- Eyes — sharp, calculating -->
+      <ellipse cx="16.5" cy="16.5" rx="2.2" ry="1.9" fill="white"/>
+      <ellipse cx="23.5" cy="16.5" rx="2.2" ry="1.9" fill="white"/>
+      <circle cx="16.7" cy="16.6" r="1.2" fill="#1e3a5c"/>
+      <circle cx="23.7" cy="16.6" r="1.2" fill="#1e3a5c"/>
+      <circle cx="17.1" cy="16.2" r=".35" fill="white"/>
+      <circle cx="24.1" cy="16.2" r=".35" fill="white"/>
+      <!-- Brows — arched, precise -->
+      <path d="M14.2 13.5 Q16.5 12.5 18.5 13.3" stroke="#8B6020" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <path d="M21.5 13.3 Q23.5 12.5 25.8 13.5" stroke="#8B6020" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <!-- Nose -->
+      <path d="M19.5 18.5 Q20 20.5 20.5 18.5" stroke="#C8A070" stroke-width=".7" fill="none"/>
+      <!-- Mouth — composed, neutral -->
+      <path d="M17.5 22.5 Q20 23.5 22.5 22.5" stroke="#B07050" stroke-width="1" fill="none" stroke-linecap="round"/>
+      <!-- Ear -->
+      <ellipse cx="11.2" cy="18" rx="1.3" ry="1.8" fill="#E0B890"/>
+      <ellipse cx="28.8" cy="18" rx="1.3" ry="1.8" fill="#E0B890"/>
+      <!-- Earring -->
+      <circle cx="11.2" cy="19.8" r=".7" fill="#2b8fff" opacity=".8"/>
+      <circle cx="28.8" cy="19.8" r=".7" fill="#2b8fff" opacity=".8"/>
+    </svg>`,
     av:'av-n',nc:'mn-n',
     faceClass:'char-face-n',nameClass:'char-name-n',tagClass:'char-tag-n'
   },
@@ -659,7 +690,42 @@ const AGENTS={
     title:'Head of Risk · Ex-JPMorgan (20 yrs)',
     bio:'Seen every blowup. Doesn\'t care if you\'re right — cares if you survive.',
     tags:['INVALIDATION','R:R','POSITION SIZE'],
-    face:'🛡️',
+    face:`<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Head -->
+      <ellipse cx="20" cy="17.5" rx="9.5" ry="10" fill="#D4956A"/>
+      <!-- Neck -->
+      <rect x="16" y="25" width="8" height="5" rx="2" fill="#D4956A"/>
+      <!-- Suit — dark, authoritative -->
+      <path d="M7 40 L14 27 L20 32 L26 27 L33 40Z" fill="#0c0c18"/>
+      <path d="M18 32 L20 39 L22 32" fill="#c8a840" stroke="#c8a840" stroke-width=".5"/>
+      <!-- Hair — salt-and-pepper, close-cropped -->
+      <path d="M11 16 Q11 7 20 7 Q29 7 29 16 Q26 10 20 10 Q14 10 11 16Z" fill="#3a3a3a"/>
+      <!-- Grey streaks -->
+      <path d="M14 10 Q13 12 11 15" stroke="#aaaaaa" stroke-width=".8" stroke-linecap="round" fill="none"/>
+      <path d="M22 8.5 Q24 10 26 13" stroke="#aaaaaa" stroke-width=".8" stroke-linecap="round" fill="none"/>
+      <!-- Eyes — intense, weathered -->
+      <ellipse cx="16.5" cy="17" rx="2.1" ry="2" fill="white"/>
+      <ellipse cx="23.5" cy="17" rx="2.1" ry="2" fill="white"/>
+      <circle cx="16.7" cy="17.1" r="1.2" fill="#2a1a0a"/>
+      <circle cx="23.7" cy="17.1" r="1.2" fill="#2a1a0a"/>
+      <circle cx="17.1" cy="16.7" r=".35" fill="white"/>
+      <circle cx="24.1" cy="16.7" r=".35" fill="white"/>
+      <!-- Brows — heavy, furrowed -->
+      <path d="M14 13.5 Q16.5 12.5 18.8 13.8" stroke="#2a1a0a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      <path d="M21.2 13.8 Q23.5 12.5 26 13.5" stroke="#2a1a0a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      <!-- Frown line between brows -->
+      <path d="M19.5 13.2 L20.5 13.2" stroke="#2a1a0a" stroke-width=".8" stroke-linecap="round"/>
+      <!-- Nose — strong -->
+      <path d="M19 18.5 Q20 21 21 18.5" stroke="#A0704A" stroke-width=".9" fill="none" stroke-linecap="round"/>
+      <!-- Mouth — straight line, no-nonsense -->
+      <path d="M16.5 23 Q20 23.5 23.5 23" stroke="#9A6040" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <!-- Jawline definition -->
+      <path d="M13 21 Q12 24 14 27" stroke="#B07050" stroke-width=".5" fill="none"/>
+      <path d="M27 21 Q28 24 26 27" stroke="#B07050" stroke-width=".5" fill="none"/>
+      <!-- Ear -->
+      <ellipse cx="11" cy="18.5" rx="1.5" ry="2.2" fill="#C08050"/>
+      <ellipse cx="29" cy="18.5" rx="1.5" ry="2.2" fill="#C08050"/>
+    </svg>`,
     av:'av-r',nc:'mn-r',
     faceClass:'char-face-r',nameClass:'char-name-r',tagClass:'char-tag-r'
   },
@@ -671,11 +737,66 @@ const AGENTS={
     title:'Chief Decision Officer · Multi-Agent Judge',
     bio:'No emotion. No bias. When Aria speaks, the room goes quiet.',
     tags:['VERDICT','FILTER','CONSENSUS'],
-    face:'⚖️',
+    face:`<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Head -->
+      <ellipse cx="20" cy="17" rx="8.5" ry="10" fill="#E8B88A"/>
+      <!-- Neck -->
+      <rect x="16.5" y="25" width="7" height="5" rx="2" fill="#E8B88A"/>
+      <!-- Structured jacket -->
+      <path d="M8 40 L15 27 L20 31 L25 27 L32 40Z" fill="#1a1a2e"/>
+      <path d="M18.5 29 L20 35 L21.5 29" fill="#ffaa00" opacity=".7"/>
+      <!-- Hair — black, sleek, pulled back with wisps -->
+      <path d="M11.5 14 Q12 5 20 5 Q28 5 28.5 14 Q26 7 20 7.5 Q14 7 11.5 14Z" fill="#0a0a0a"/>
+      <!-- Side wisps -->
+      <path d="M11.5 14 Q10 12 11 10" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <path d="M28.5 14 Q30 12 29 10" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <!-- Bun suggestion at top -->
+      <ellipse cx="20" cy="6.5" rx="4" ry="2.5" fill="#0a0a0a"/>
+      <!-- Eyes — almond-shaped, piercing -->
+      <path d="M13.8 16 Q16.5 14.2 19.2 16 Q16.5 17.8 13.8 16Z" fill="white"/>
+      <path d="M20.8 16 Q23.5 14.2 26.2 16 Q23.5 17.8 20.8 16Z" fill="white"/>
+      <circle cx="16.5" cy="16" r="1.3" fill="#0a1a0a"/>
+      <circle cx="23.5" cy="16" r="1.3" fill="#0a1a0a"/>
+      <circle cx="16.9" cy="15.6" r=".35" fill="white"/>
+      <circle cx="23.9" cy="15.6" r=".35" fill="white"/>
+      <!-- Eyeliner effect -->
+      <path d="M13.8 16 Q16.5 14.2 19.2 16" stroke="#0a0a0a" stroke-width=".6" fill="none"/>
+      <path d="M20.8 16 Q23.5 14.2 26.2 16" stroke="#0a0a0a" stroke-width=".6" fill="none"/>
+      <!-- Brows — clean, precise -->
+      <path d="M14.5 13.3 Q16.5 12.5 18.5 13.2" stroke="#0a0a0a" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <path d="M21.5 13.2 Q23.5 12.5 25.5 13.3" stroke="#0a0a0a" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <!-- Nose — refined -->
+      <path d="M19.5 18 Q20 19.5 20.5 18" stroke="#C08060" stroke-width=".7" fill="none"/>
+      <!-- Mouth — poised, slight upward set -->
+      <path d="M17 22 Q20 23.5 23 22" stroke="#B07050" stroke-width="1" fill="none" stroke-linecap="round"/>
+      <path d="M17 22 Q18 22.5 20 22.5 Q22 22.5 23 22" fill="#C07060" opacity=".4"/>
+      <!-- Ear -->
+      <ellipse cx="11.5" cy="17.5" rx="1.3" ry="1.8" fill="#D8A880"/>
+      <ellipse cx="28.5" cy="17.5" rx="1.3" ry="1.8" fill="#D8A880"/>
+      <!-- Gold drop earring -->
+      <circle cx="11.5" cy="19" r=".6" fill="#ffaa00"/>
+      <circle cx="28.5" cy="19" r=".6" fill="#ffaa00"/>
+    </svg>`,
     av:'av-e',nc:'mn-e',
     faceClass:'char-face-e',nameClass:'char-name-e',tagClass:'char-tag-e'
   }
 };
+
+// Populate sidebar roster from AGENTS
+function buildRoster(){
+  const el=document.getElementById('rosterList');
+  if(!el)return;
+  const badgeMap={analyst:'QUANT',news:'MACRO',risk:'RISK',exec:'JUDGE'};
+  el.innerHTML=Object.values(AGENTS).map(ag=>`
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:28px;height:28px;flex-shrink:0;border-radius:6px;overflow:hidden;border:1px solid var(--border2)">${ag.face}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--sans);font-size:10px;font-weight:700;color:var(--${ag.key==='analyst'?'accent':ag.key==='news'?'blue':ag.key==='risk'?'red':'amber'})">${ag.name}</div>
+        <div style="font-size:8px;color:var(--text2)">${ag.role}</div>
+      </div>
+      <div style="font-size:7px;color:var(--${ag.key==='analyst'?'accent':ag.key==='news'?'blue':ag.key==='risk'?'red':'amber'});border:1px solid currentColor;padding:1px 5px;opacity:.6;border-radius:2px">${badgeMap[ag.key]}</div>
+    </div>`).join('');
+}
 
 function clearFeed(){
   document.getElementById('feed').innerHTML='';exchangeN=0;
@@ -691,7 +812,9 @@ function charCard(ag, extraFaceClass='', tsStr=''){
   const tags = ag.tags.map(t=>`<span class="char-tag ${ag.tagClass}">${t}</span>`).join('');
   return `
     <div class="char-card">
-      <div class="char-face ${ag.faceClass} ${extraFaceClass}">${ag.face}</div>
+      <div class="char-face-wrap">
+        <div class="char-face ${ag.faceClass} ${extraFaceClass}">${ag.face}</div>
+      </div>
       <div class="char-info">
         <div class="char-name ${ag.nameClass}">${ag.name}</div>
         <div class="char-title">${ag.title}</div>
@@ -733,11 +856,25 @@ async function speak(key,text,style,ms=700){
 function getField(raw,key){const m=raw.match(new RegExp(key+'[:\\s]+([^\\n]+)','i'));return m?m[1].trim():'—'}
 function getBlock(raw,from,to){const m=raw.match(new RegExp(from+':?\\s*([\\s\\S]*?)(?='+to+':|$)','i'));return m?m[1].trim():''}
 function parseExchanges(raw){
-  const block=getBlock(raw,'EXCHANGES','EXECUTION AGENT JUDGMENT');
+  // Try multiple stop markers — model sometimes varies capitalisation/spacing
+  let block='';
+  const stopMarkers=['EXECUTION AGENT JUDGMENT','EXECUTION AGENT JUDGEMENT','EXECUTION AGENT:','FILTER RESULT'];
+  for(const stop of stopMarkers){
+    const m=raw.match(new RegExp('EXCHANGES:?\\s*([\\s\\S]*?)(?='+stop+'|$)','i'));
+    if(m&&m[1].trim().length>10){block=m[1].trim();break;}
+  }
+  // Final fallback — grab everything between EXCHANGES: and the first field label
+  if(!block){
+    const m=raw.match(/EXCHANGES:?\s*([\s\S]*?)(?=\nASSET:|\nACTION:|\nFILTER|$)/i);
+    if(m)block=m[1].trim();
+  }
   if(!block)return[];
   return block.split('\n').map(l=>l.trim()).filter(l=>l.length>4).reduce((acc,line)=>{
     const m=line.match(/^\[?(ANALYST|NEWS|RISK)\]?[:.]?\s*(.*)/i);
-    if(m){const key=m[1].toLowerCase()==='analyst'?'analyst':m[1].toLowerCase()==='news'?'news':'risk';if(m[2].trim())acc.push({agent:key,text:m[2].trim()});}
+    if(m){
+      const key=m[1].toLowerCase()==='analyst'?'analyst':m[1].toLowerCase()==='news'?'news':'risk';
+      if(m[2].trim())acc.push({agent:key,text:m[2].trim()});
+    }
     return acc;
   },[]);
 }
@@ -996,12 +1133,15 @@ End with exactly: Generated via multi-agent consensus across structure, momentum
 
     addDivider('live debate · '+active);
     if(exchanges.length===0){
-      const block=getBlock(raw,'EXCHANGES','EXECUTION AGENT');
-      const lines=block.split('\n').filter(l=>l.trim().length>4);
+      // Hard fallback — scan raw for any tagged lines at all
+      const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l.length>4);
       for(const line of lines){
-        const agent=line.toLowerCase().startsWith('[risk]')?'risk':line.toLowerCase().startsWith('[news]')?'news':'analyst';
-        const text=line.replace(/^\[?(ANALYST|NEWS|RISK)\]?[:.]?\s*/i,'').trim();
-        if(text)await speak(agent,text,bStyle(agent,text),550);
+        const m=line.match(/^\[?(ANALYST|NEWS|RISK)\]?[:.]?\s*(.*)/i);
+        if(m){
+          const agent=m[1].toLowerCase()==='analyst'?'analyst':m[1].toLowerCase()==='news'?'news':'risk';
+          const text=m[2].trim();
+          if(text)await speak(agent,text,bStyle(agent,text),550);
+        }
       }
     }else{
       for(const ex of exchanges){
@@ -1010,7 +1150,8 @@ End with exactly: Generated via multi-agent consensus across structure, momentum
       }
     }
 
-    const judgment=getBlock(raw,'EXECUTION AGENT JUDGMENT','FILTER RESULT');
+    // Judgment — try both spellings
+    const judgment=getBlock(raw,'EXECUTION AGENT JUDGMENT','FILTER RESULT')||getBlock(raw,'EXECUTION AGENT JUDGEMENT','FILTER RESULT')||getBlock(raw,'EXECUTION AGENT JUDGMENT','ASSET')||getBlock(raw,'EXECUTION AGENT JUDGEMENT','ASSET');
     if(judgment){
       await wait(600);addDivider('execution judgment');
       await speak('exec',judgment,'ex',1000);await wait(400);
@@ -1080,6 +1221,7 @@ End with exactly: Generated via multi-agent consensus across structure, momentum
 
 (async()=>{
   setStatus('LOADING');
+  buildRoster();
   await loadAll(false);
   setStatus('READY');
   startPolling();
